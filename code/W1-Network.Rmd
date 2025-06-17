@@ -1,0 +1,166 @@
+---
+title: "W1 Network"
+output: html_notebook
+---
+
+```{r Load Packages }
+packages <- c("tidyverse", "haven", "dplyr","igraph", "reshape2", "qgraph")
+lapply(packages, function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg)
+  }
+  library(pkg, character.only = TRUE)
+})
+```
+
+```{r Wave 1 data Formating}
+#Convert wave 1 data cbcl with new category labels and excluding total score to wide format 
+
+cbcl_wide_wave1 <- cbcl_long_wave1 %>%
+  filter(category != "Total Score CBCL") %>%  # optional: exclude total
+  pivot_wider(names_from = category, values_from = score)
+```
+
+
+
+```{r Plotting Network using igraph}
+
+# Correlation Matrix
+symptom_corr <- cbcl_wide_wave1 %>%
+  select(-folio) %>%
+  cor(use = "pairwise.complete.obs")
+
+
+# Convert to edge list and apply correlation filter 
+corr_edges <- as.data.frame(as.table(symptom_corr)) %>%
+  filter(Var1 != Var2, abs(Freq) > 0.4)  # stricter threshold here
+
+# Create igraph object
+g <- graph_from_data_frame(corr_edges, directed = FALSE)
+
+#Renaming Variables for Plotting of Network 
+name_mapping <- c(
+  "Attention Issues" = "AT",
+  "Agressive Conduct" = "AGR",
+  "Sleep Problems" = "SP",
+  "Emotional Reactivity" = "ER",
+  "Internalising Behaviours" = "IB",
+  "Anxious/Depressed" = "AD",
+  "Somatic Complaints" = "SC"
+)
+
+# Apply custom labels for plotting
+V(g)$label <- name_mapping[V(g)$name]
+
+
+
+# Plot Network
+plot(
+  g,
+  layout = layout_with_fr(g),
+  vertex.size = 25,
+  vertex.label.cex = 1.2,
+  vertex.label.dist = 0.3,
+  vertex.label.color = "black",
+  vertex.color = "lightblue",
+  edge.width = abs(E(g)$Freq) * 6,
+  edge.color = "gray60",
+  main = "CBCL Symptom Correlation Network (r > 0.4)"
+)
+
+
+```
+
+
+
+```{r Plotting Network using Lasso + Centrality Analysis from (Fritz et al, 2020)}
+
+
+# Step 1 Create Correlation matrix (excluding 'folio')
+symptom_data <- cbcl_wide_wave1 %>% select(-folio) #filtering participant ID 
+symptom_corr <- cor(symptom_data, use = "pairwise.complete.obs") # cor function computes the correlation between columns x and y,  "pairwise.complete.obsc omputes each pairwise correlation using only the rows (observations) that have non-missing values for that pair of variables
+
+# Step 2 Apply graphical lasso using qgraph
+# This automatically estimates a regularized partial correlation network
+symptom_glasso <- qgraph(
+  symptom_corr,
+  graph = "glasso",#obtain an optimal sparse estimate of the partial correlation matrix using the glasso package (Friedman, Hastie and Tibshirani, 2011)
+  sampleSize = nrow(symptom_data),
+  layout = "spring",  # "spring" gives a force embedded layout, other options are "circle" or "groups", in fritz paper she used "layout"
+  details = TRUE,
+  minimum = 0.1,      # filter edges below this value not sure if we should filter for a maximum too 
+  edge.color = "skyblue",
+  edge.width = 1,     # qgraph auto scales edge widths
+  nodeNames = colnames(symptom_corr),
+  theme = "Hollywood",
+  fade = FALSE,
+  label.cex = 1.1,
+  legend = TRUE,
+  legend.cex= 0.5,
+  main = "CBCL Symptom Network (Graphical Lasso, r > 0.4)"
+)
+
+#Centrality Measure Analysis 
+#Output table gives: betweenness centrality, closeness, strength, expected influence, shortest path length 
+W1_Centrality <- centrality_auto(symptom_glasso)
+print(W1_Centrality)
+
+
+```
+Interpretation of Centrality Measures for Wave 1 data Answering Hypothesis 2 and 3 
+- Emotional Reactivity (EmR) is the most central symptom:
+    Highest strength (sum of all absolute edge weights connected to a node) and expected influence.
+    Highest closeness (inverse of average distance to all nodes, the higher the value the quickest the access to all other nodes)
+    High betweenness → acts as a bridge between symptoms.
+    
+-Aggressive Conduct (AgC):
+  Second most central.
+  Also has high betweenness and strength.
+  Likely a secondary target — it's well connected and bridges others.
+  
+-Somatic Complaints (SmC), Internalising Behaviours (InB), and Sleep Problems (SlP):
+  Lower in all metrics.
+  Likely peripheral symptoms — less influence on the broader network.
+  
+-Anxious/Depressed (A/D):
+  Moderate strength but zero betweenness.
+  Not a bridge but still relatively well connected.
+
+Betweeness Centrality (paths most traveled when shortest paths are calculated)
+EmR ↔ AgC — most central bridge in the network (score: 10)
+AgC ↔ AtI — 2nd most important (score: 6)
+EmR ↔ InB and EmR ↔ SmC — also important (score: 4–5)
+
+
+```{r Calcualting Global Network Strength, Hypothesis 1 }
+#Use the getWmat to extract the weight matrix (edge weights) from a qgraph object 
+edge_weights_matrix <- getWmat(symptom_glasso) #In resulting adjacency matrix each cell represents the edge weight correlation between variables can be positive (direct relationship ) or negative (inverse relationship) or 0 (no edge)
+
+# Calculating global strength by using calculated edge weight adjacency matrix from above, excludes diagnoal (repeated relationships), extracts only unique edge weights, takes their absolute value and adds them all up thus global network  strength = sum of absolute edge weights
+#Once we wave the global connectivity for other waves we can compare to see if other waves have greater or decreased symptomp connectivity 
+
+global_network_strength_W1 <- sum(abs(edge_weights_matrix[upper.tri(edge_weights_matrix)]))
+print(global_strength)
+
+
+```
+```{r Calcualting Q-index Modularity}
+#Modularity measures the strength of division of a network into modules (i.e., communities or clusters). A higher Q (typically 0.3–0.7) indicates a clearer, well-separated modular structure.
+
+# Convert edge weight adjacency matrix from above to igraph object
+g <- graph_from_adjacency_matrix(edge_weights_matrix, mode = "undirected", weighted = TRUE, diag = FALSE)
+
+#Convert edge weights to absolute values (lasso does allow for negative weight values)
+E(g)$weight <- abs(E(g)$weight)
+
+#Cluster_walktrap function tries to find densley connected subgraphs "communities" in a graph via random walks. The idea is that short random walks tend to stay in the same community 
+community <- cluster_walktrap(g, weights = E(g)$weight)
+
+#Modularity function calculates how modular is a given division of a graph into subgraphs, from (McElroy et al) Q index >0.3 suggesting nodes are arranged in non-random communities 
+
+modularity_Q_W1 <- modularity(community)
+print(modularity_Q)
+
+
+```
+

@@ -1,0 +1,226 @@
+---
+title: "DataWrangling"
+author: "Greta Dertwinkel"
+date: "2025-06-02"
+output: html_document
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Set Up
+```{r set-up}
+# Load necessary packages (install if not present)
+
+packages <- c("tidyverse", "haven", "dplyr")
+lapply(packages, function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg)
+  }
+  library(pkg, character.only = TRUE)
+})
+```
+
+
+##  Read in Data Wave 1 
+```{r}
+raw_data_wave1 <- read_dta("unzipped_data/Evaluaciones_2010.dta")
+
+#Filter data to onky include participant identifier "folio", age "edad_meses" and any column heading starting with cbcl 
+
+data_wave1_f <- raw_data_wave1 %>%
+  select(folio, edad_meses, starts_with("cbcl"))
+```
+
+# Read in Data Wave 2
+```{r}
+raw_data_wave2 <- read_dta("unzipped_data/Evaluaciones_2012.dta")
+
+#Filter data to onky include participant identifier "folio", age "edad_meses" and any column heading starting with cbcl 
+
+data_wave2_f <- raw_data_wave2 %>%
+  select(folio, edad_meses, starts_with("cbcl"))
+```
+
+#Read in Data Wave 3
+```{r}
+raw_data_wave3 <- read_sav("unzipped_data/Evaluaciones_2017.sav")
+
+#Filter data to onky include participant identifier "folio", age "edad_mesesr and any column heading starting with cbcl 
+
+data_wave3_f <- raw_data_wave3 %>%
+  select(folio, edad_mesesr, starts_with("cbcl"))
+```
+
+#Read in Data from Wave 1 for Alcohol Use 
+```{r}
+data_SU_W1 <- read_dta("unzipped_data/Entrevistada_2010.dta")
+
+#Filter data to onky include participant identifier "folio" and columns with alcohol use report "G9: Asking During pregnancy did you consume an alcoholic beverage?
+
+alcohol_use_data <- data_SU_W1 %>%
+  select(folio, starts_with("g9"))
+```
+
+#Initial Data Exploration Visualisation
+```{r}
+#Distribution of Responses to g9 
+ggplot(alcohol_use_data, aes(x = factor(g9))) +
+  geom_bar() +
+  labs(x = "Response to g9", y = "Count", title = "Distribution of Responses to g9")
+
+
+#plot demographics of all these categories, female ratio, socioeconomic status 
+```
+
+```{r Wave 1 Data Formatting }
+#Convert cbcl to Long format for Wave 1 data 
+cbcl_long_wave1 <- data_wave1_f %>%
+  pivot_longer(
+    cols = -folio,
+    names_to = "category",
+    values_to = "score"
+  )
+
+#Changing category labels 
+category_labels <- c(
+  "cbcl1_pb_1" = "Emotional Reactivity",
+  "cbcl1_pb_2" = "Anxious/Depressed",
+  "cbcl1_pb_3" = "Somatic Complaints",
+  "cbcl1_pb_4" = "Internalising Behaviours",
+  "cbcl1_pb_5" = "Sleep Problems",
+  "cbcl1_pb_6" = "Attention Issues",
+  "cbcl1_pb_7" = "Agressive Conduct",
+  "cbcl1_pb_t" = "Total Score CBCL") 
+
+cbcl_long_wave1 <- cbcl_long_wave1 %>%
+  mutate(category = recode(category, !!!category_labels)) 
+  
+#Filter Data to only have the categories of "puntaje bruto" raw score per category and total sum of raw scores 
+cbcl_long_wave1 <- cbcl_long_wave1 %>%
+  filter(category %in% c("Emotional Reactivity", "Anxious/Depressed", "Somatic Complaints","Internalising Behaviours", "Sleep Problems", "Attention Issues", "Agressive Conduct", "Total Score CBCL"))
+
+
+```
+
+
+```{r}
+#Spaghetti Plot CBCL Scores of All Participants in Wave 1 separating individual category scores and total scores 
+
+# Plot without Total Score
+cbcl_long_wave1 %>%
+  filter(category != "Total Score CBCL") %>%
+  ggplot(aes(x = category, y = score, group = folio, colour = folio)) +
+  geom_line(alpha = 0.2) +
+  labs(title = "CBCL Subscale Scores per Participant",
+       x = "CBCL Category", y = "Score") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Plot only Total Score
+cbcl_long_wave1 %>%
+  filter(category == "Total Score CBCL") %>%
+  ggplot(aes(x = folio, y = score)) +
+  geom_col() +
+  labs(title = "Total CBCL Scores per Participant",
+       x = "Participant ID", y = "Total Score") +
+  theme_minimal() +
+  theme(axis.text.x = element_blank())
+
+
+```
+
+
+
+```{r}
+#Plotting Only Random Subset of Participants to obtain clearer visualsiation
+
+# Step 1: Set seed and sample 50 participants
+set.seed(123)  # for reproducibility
+sample_ids <- cbcl_long_wave1 %>%
+  distinct(folio) %>%
+  sample_n(50) %>%
+  pull(folio)
+
+# Separate data
+subscale_data <- cbcl_long_wave1 %>%
+  filter(folio %in% sample_ids, category != "Total Score CBCL")
+
+
+#  Plot subscale scores per participant
+ggplot(subscale_data, aes(x = category, y = score, group = folio)) +
+  geom_line(alpha = 0.4) +
+  labs(title = "CBCL Subscale Scores per Participant (Sample of 50)",
+       x = "CBCL Category", y = "Score") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+#Make spagetti plot considering time variable in the x and faceted by category of the cbcl (one graph for each)
+
+
+```
+```{r Wave 2 Data Formatting}
+#Convert cbcl to Long format for Wave 1 data 
+cbcl_long_wave2 <- data_wave2_f %>%
+  pivot_longer(
+    cols = -folio,
+    names_to = "category",
+    values_to = "score"
+  )
+
+#Changing category labels 
+category_labels <- c(
+  "cbcl1_pb_1" = "Emotional Reactivity",
+  "cbcl1_pb_2" = "Anxious/Depressed",
+  "cbcl1_pb_3" = "Somatic Complaints",
+  "cbcl1_pb_4" = "Internalising Behaviours",
+  "cbcl1_pb_5" = "Sleep Problems",
+  "cbcl1_pb_6" = "Attention Issues",
+  "cbcl1_pb_7" = "Agressive Conduct",
+  "cbcl1_pb_t" = "Total Score CBCL") 
+
+cbcl_long_wave2 <- cbcl_long_wave2 %>%
+  mutate(category = recode(category, !!!category_labels))  
+
+  
+#Filter Data to only have the categories of "puntaje bruto" raw score per category and total sum of raw scores 
+cbcl_long_wave2 <- cbcl_long_wave2 %>%
+  filter(category %in% c("Emotional Reactivity", "Anxious/Depressed", "Somatic Complaints","Internalising Behaviours", "Sleep Problems", "Attention Issues", "Agressive Conduct", "Total Score CBCL"))
+```
+
+
+
+```{r Wave 3 Data Formatting}
+#Convert cbcl to Long format for Wave 1 data 
+cbcl_long_wave3 <- data_wave3_f %>%
+  pivot_longer(
+    cols = -folio,
+    names_to = "category",
+    values_to = "score"
+  )
+
+#Changing category labels 
+category_labels <- c(
+  "cbcl1_pb_1" = "Emotional Reactivity",
+  "cbcl1_pb_2" = "Anxious/Depressed",
+  "cbcl1_pb_3" = "Somatic Complaints",
+  "cbcl1_pb_4" = "Internalising Behaviours",
+  "cbcl1_pb_5" = "Sleep Problems",
+  "cbcl1_pb_6" = "Attention Issues",
+  "cbcl1_pb_7" = "Agressive Conduct",
+  "cbcl1_pb_t" = "Total Score CBCL") 
+
+cbcl_long_wave3 <- cbcl_long_wave3 %>%
+  mutate(category = recode(category, !!!category_labels)) 
+
+
+  
+#Filter Data to only have the categories of "puntaje bruto" raw score per category and total sum of raw scores 
+cbcl_long_wave3 <- cbcl_long_wave3 %>%
+  filter(category %in% c("Emotional Reactivity", "Anxious/Depressed", "Somatic Complaints","Internalising Behaviours", "Sleep Problems", "Attention Issues", "Agressive Conduct", "Total Score CBCL"))
+
+cbcl_long_wave3  <- cbcl_long_wave3  %>% drop_na()
+```
+
