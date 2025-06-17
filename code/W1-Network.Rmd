@@ -97,7 +97,7 @@ symptom_glasso <- qgraph(
   label.cex = 1.1,
   legend = TRUE,
   legend.cex= 0.5,
-  main = "CBCL Symptom Network (Graphical Lasso, r > 0.4)"
+  main = "CBCL Symptom Network (Graphical Lasso, r > 0.5)"
 )
 
 #Centrality Measure Analysis 
