@@ -26,7 +26,7 @@ lapply(packages, function(pkg) {
 
 ##  Read in Data Wave 1 
 ```{r}
-raw_data_wave1 <- read_dta("unzipped_data/Evaluaciones_2010.dta")
+raw_data_wave1 <- read_dta("../data/Evaluaciones_2010.dta")
 
 #Filter data to onky include participant identifier "folio", age "edad_meses" and any column heading starting with cbcl 
 
@@ -36,7 +36,7 @@ data_wave1_f <- raw_data_wave1 %>%
 
 # Read in Data Wave 2
 ```{r}
-raw_data_wave2 <- read_dta("unzipped_data/Evaluaciones_2012.dta")
+raw_data_wave2 <- read_dta("../data/Evaluaciones_2012.dta")
 
 #Filter data to onky include participant identifier "folio", age "edad_meses" and any column heading starting with cbcl 
 
@@ -46,7 +46,7 @@ data_wave2_f <- raw_data_wave2 %>%
 
 #Read in Data Wave 3
 ```{r}
-raw_data_wave3 <- read_sav("unzipped_data/Evaluaciones_2017.sav")
+raw_data_wave3 <- read_sav("../data/Evaluaciones_2017.sav")
 
 #Filter data to onky include participant identifier "folio", age "edad_mesesr and any column heading starting with cbcl 
 
@@ -56,9 +56,9 @@ data_wave3_f <- raw_data_wave3 %>%
 
 #Read in Data from Wave 1 for Alcohol Use 
 ```{r}
-data_SU_W1 <- read_dta("unzipped_data/Entrevistada_2010.dta")
+data_SU_W1 <- read_dta("../data/Entrevistada_2010.dta")
 
-#Filter data to onky include participant identifier "folio" and columns with alcohol use report "G9: Asking During pregnancy did you consume an alcoholic beverage?
+#Filter data to only include participant identifier "folio" and columns with alcohol use report "G9: Asking During pregnancy did you consume an alcoholic beverage?
 
 alcohol_use_data <- data_SU_W1 %>%
   select(folio, starts_with("g9"))

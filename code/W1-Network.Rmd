@@ -140,7 +140,7 @@ edge_weights_matrix <- getWmat(symptom_glasso) #In resulting adjacency matrix ea
 #Once we wave the global connectivity for other waves we can compare to see if other waves have greater or decreased symptomp connectivity 
 
 global_network_strength_W1 <- sum(abs(edge_weights_matrix[upper.tri(edge_weights_matrix)]))
-print(global_strength)
+print(global_network_strength_W1)
 
 
 ```
@@ -159,7 +159,7 @@ community <- cluster_walktrap(g, weights = E(g)$weight)
 #Modularity function calculates how modular is a given division of a graph into subgraphs, from (McElroy et al) Q index >0.3 suggesting nodes are arranged in non-random communities 
 
 modularity_Q_W1 <- modularity(community)
-print(modularity_Q)
+print(modularity_Q_W1)
 
 
 ```
