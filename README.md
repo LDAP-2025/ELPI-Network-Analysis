@@ -13,7 +13,7 @@ Welcome to Network Adventures!
 	5. Temperature changes across time.  
 
  **Stratification Hypotheses:**  
- 	1. Changes in global network strength vary by prenatal exposure to alcohol. 
+ 	1. Changes in global network strength vary by prenatal exposure to alcohol.  
 	2. Changes in global network expected influence (EI) vary by prenatal exposure.  
 	3. Changes in centrality vary by prenatal exposure to alcohol.  
 	4. Changes in modularity vary by prenatal exposure to alcohol.  
