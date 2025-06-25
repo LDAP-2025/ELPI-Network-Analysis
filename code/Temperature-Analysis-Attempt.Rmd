@@ -1,0 +1,218 @@
+---
+title: "Temperature_Attempt"
+output: html_document
+date: "2025-06-25"
+---
+
+```{r Load Packages}
+packages <- c("tidyverse", "haven", "dplyr","igraph", "reshape2", "qgraph", "psychonetrics")
+lapply(packages, function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg)
+  }
+  library(pkg, character.only = TRUE)
+})
+```
+
+
+Temperature Calculation based on (Grimes et al, 2025) "Network Temperature as a metric of stability in depression symptoms across adolescence", code freely available on git hub @poppyzenzi network_temperature.
+
+```{r Collating Data from all waves into One Data Frame}
+# Add a time indicator to each dataset
+cbcl_wide_wave1_temp <- cbcl_wide_wave1 %>% mutate(time = 1)
+cbcl_wide_wave2_temp <- cbcl_wide_wave2 %>% mutate(time = 2)
+cbcl_wide_wave3_temp<-cbcl_wide_wave3 %>% mutate(time = 3)
+
+# Combine all waves into one long-format dataframe
+all_waves_long <- bind_rows(cbcl_wide_wave1_temp , cbcl_wide_wave2_temp, cbcl_wide_wave3_temp)
+
+# Pivot to wide format: one row per id, separate columns per symptom per timepoint
+all_waves_wide <- all_waves_long  %>%
+  pivot_wider(
+    id_cols = folio,
+    names_from = time,
+    values_from = -c(folio, time),
+    names_sep = "."
+  )
+
+
+```
+
+(Grimes et al, 2025) preformed bootstraping prior to  calculation of temperature.  This analysis does not include bootstrapped uncertainty — just the analytical standard error–based intervals. 
+
+CBCL raw scores per category have to be binarised in order to be able to run the Ising Model. Syndrome scales (e.g., Anxious/Depressed, Withdrawn/Depressed, Somatic Complaints, Social Problems, Thought Problems, Attention Problems, Rule‑Breaking Behavior, Aggressive Behavior) often include roughly 10–15 items each.
+
+Summary in one resource states each syndrome’s raw score “will range from 0 to 30,” indicating around 15 items rated up to 2 each.  Based on the previous, Approach for binarising CBCL scores decided here is range from 0-15 will  be considered not-significant and range 15-30 will be considered significant.
+
+Setting the range from only significant if score above 15 outputs these results so decided to go for scored as significant is score above 10
+
+With cut off at 15:
+Emotional Reactivity :  31  significant ratings across all waves
+Anxious/Depressed :  7  significant ratings across all waves
+Somatic Complaints :  23  significant ratings across all waves
+Withdrawn :  0  significant ratings across all waves
+Sleep Problems :  0  significant ratings across all waves
+Attention Problems :  0  significant ratings across all waves
+Aggressive Behavior :  0  significant ratings across all waves
+
+With cut off at 10: 
+Emotional Reactivity :  596  significant ratings across all waves
+Anxious/Depressed :  906  significant ratings across all waves
+Somatic Complaints :  421  significant ratings across all waves
+Withdrawn :  0  significant ratings across all waves
+Sleep Problems :  349  significant ratings across all waves
+Attention Problems :  0  significant ratings across all waves
+Aggressive Behavior :  0  significant ratings across all waves
+
+Still doesnt make much sense if withdrawn attention problems and agressive behaviour categories remain insignficiant across ALL participants. 
+
+```{r Imputing CBCL Raw Score to Binary Values }
+
+# List of CBCL categories (as they appear *before* the .1/.2/.3 suffix)
+categories <- c("Emotional Reactivity", "Anxious/Depressed", "Somatic Complaints","Internalising Behaviours", "Sleep Problems", "Attention Issues", "Agressive Conduct")
+
+# Number of waves
+waves <- 1:3
+
+# Loop through each category and wave
+for (cat in categories) {
+  for (w in waves) {
+    raw_col <- paste0(cat, ".", w)
+    bin_col <- paste0(cat, "_bin.", w)
+    
+    # Safely check if column exists before processing
+    if (raw_col %in% names(all_waves_wide)) {
+      all_waves_wide[[bin_col]] <- ifelse(all_waves_wide[[raw_col]] > 10, 1, 0)
+    } else {
+      warning(paste("Column not found:", raw_col))
+    }
+  }
+}
+
+#select only columns with binarised symptoms and participant id
+all_waves_wide_binarised <- all_waves_wide %>%
+  select(folio, matches("_bin\\.(1|2|3)$"))
+
+```
+
+```{r Exploring Values after Imputation}
+categories <- c("Emotional Reactivity", "Anxious/Depressed", "Somatic Complaints", 
+                "Withdrawn", "Sleep Problems", "Attention Problems", "Aggressive Behavior")
+
+for (cat in categories) {
+  # Build the binary column names across waves
+  bin_cols <- paste0(cat, "_bin.", 1:3)
+  
+  # Keep only the columns that exist
+  bin_cols <- bin_cols[bin_cols %in% names(all_waves_wide)]
+  
+  # Sum all 1s across these columns
+  total_ones <- sum(as.matrix(all_waves_wide[, bin_cols]), na.rm = TRUE)
+  
+  # Print result
+  cat(cat, ": ", total_ones, " significant ratings across all waves\n")
+}
+```
+
+```{r, Reshaping to Long Format for Ising Model}
+all_waves_ising <- all_waves_wide_binarised %>%
+  pivot_longer(
+    cols = -folio,                      # keep 'folio' fixed
+    names_to = c("category", "timepoint"),
+    names_sep = "\\.",                  # split at the dot
+    values_to = "value"                 # name of the value column
+  )
+
+
+
+# Assume your dataframe is called `df`
+# First, clean up column names if needed
+all_waves_ising <- all_waves_ising %>% 
+  rename(id = folio, symptom = category, time = timepoint)
+
+# Pivot wider: each symptom becomes a column
+all_waves_ising <- all_waves_ising %>%
+  pivot_wider(
+    id_cols = c(id, time),
+    names_from = symptom,
+    values_from = value
+  ) %>%
+  arrange(id, time)
+
+```
+
+```{r, Fitting Multi-group Ising Models}
+all_waves_ising <- all_waves_ising %>% drop_na(all_of(vars))
+
+#Listing the nodes in the network 
+vars <- names(all_waves_ising)[!(names(all_waves_ising) %in% c("id", "time"))]
+
+#Fits a saturated multi-group Ising model: groups = "time" tells it to model each time point as a group. All parameters (edges, thresholds, temperature) are free across groups.
+model <- Ising(all_waves_ising, vars = vars, groups = "time") %>% runmodel()
+
+model2 <- model %>% groupequal("omega") %>% runmodel
+model3 <- model2 %>% groupequal("tau") %>% runmodel
+model4 <- model3 %>% groupequal("beta") %>% runmodel
+
+```
+
+```{r}
+#create model list to compare by BIC 
+model_list <- list(
+  "1. all parameters free" = model,
+  "2. equal network (omega)" = model2,
+  "3. equal network + thresholds (omega + tau)" = model3,
+  "4. all parameters equal (omega + tau + beta)" = model4
+)
+
+# Compare models and sort by BIC
+comparison_results <- do.call(psychonetrics::compare, model_list)
+
+# Then sort by BIC
+comparison_results %>% arrange(BIC)
+
+# Model 2 fits just as well as the saturated model but is more parsimonious (simpler, fewer parameters). Lowest AIC and BIC — important because lower = better. RMSEA ≈ 0 — excellent fit. ChiSq diff with Model 1 = 19.58, but p = 1.0, meaning this constraint does not worsen fit
+best_model <- model2
+```
+
+
+
+```{r Plotting Network of best model}
+# extract edge weights and plot the network
+all_network_smfq <- getmatrix(best_model, "omega")
+network_smfq <- getmatrix(best_model, "omega")[[1]]
+graph_smfq <- qgraph(network_smfq, layout = 'spring', labels = vars, 
+                     theme = 'colorblind', label.prop=0.99, node.width=1.4, 
+                     label.norm='000000')
+```
+
+
+```{r Extracting temeperature}
+temp_smfq <- as.numeric(lapply(getmatrix(best_model, "beta"), 'mean'))
+
+betas_est <- best_model@parameters$est[best_model@parameters$matrix == "beta"]
+betas_se <- best_model@parameters$se[best_model@parameters$matrix == "beta"]
+z = qnorm(0.975)
+upperCI <- temp_smfq + (z*betas_se)
+lowerCI <- temp_smfq - (z*betas_se)
+
+time <- c(1,2,3)
+alspac_temp_data <- data.frame(Time = time,
+                               Temperature = 1/temp_smfq,
+                               UpperCI = 1/upperCI,
+                               LowerCI = 1/lowerCI)
+
+```
+
+```{r Plotting Temperature}
+
+ggplot(alspac_temp_data, aes(x = Time, y = Temperature)) +
+  geom_point(shape = 16) +
+  geom_line() +
+  geom_errorbar(aes(ymin = LowerCI, ymax = UpperCI), width = 0.1) +
+  scale_x_continuous(breaks = time) +
+  labs(x = "Time Point (Wave 1, 2, or 3)", y = "Temperature", title = "Temperature change in CBCL Symptom Network") +
+  theme_minimal()
+
+```
+
