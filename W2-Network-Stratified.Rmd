@@ -1,0 +1,21 @@
+---
+title: "W2-Network-Stratified"
+author: "Greta Dertwinkel"
+date: "2025-06-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Set Up
+```{r Load Packages}
+packages <- c("tidyverse", "haven", "dplyr","igraph", "reshape2", "qgraph")
+lapply(packages, function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    install.packages(pkg)
+  }
+  library(pkg, character.only = TRUE)
+})
+```
