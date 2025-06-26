@@ -52,7 +52,6 @@ symptom_glasso2 <- qgraph(
   main = "CBCL Symptom Network (Graphical Lasso, r > 0.4)")
 ```
 # Hypothesis 1
-
 ```{r Calcualting Global Network Strength}
 #Use the getWmat to extract the weight matrix (edge weights) from a qgraph object 
 edge_weights_matrix2 <- getWmat(symptom_glasso2) #In resulting adjacency matrix each cell represents the edge weight correlation between variables can be positive (direct relationship ) or negative (inverse relationship) or 0 (no edge)
@@ -69,7 +68,7 @@ print(global_network_strength_W2)
 ```{r centrality measures and EI}
 #Centrality Measure Analysis 
 #Output table gives: betweenness centrality, closeness, strength, expected influence, shortest path length 
-W2_Centrality <- centrality_auto(symptom_glasso)
+W2_Centrality <- centrality_auto(symptom_glasso2)
 print(W2_Centrality)
 ```
 Emotional regulation remains as the most central symptom (highest strength, closeness, betweenness, EI), followed by aggressive conduct. Patterns of the first wave remain, and there appears to be little flexibility/ change between the first two waves. The CBCL appears to be mainly driven by emotional regulation and aggressive conduct.
