@@ -20,7 +20,7 @@ lapply(packages, function(pkg) {
 ```{r Wave 2 data Formating}
 #Convert wave 2 data cbcl with new category labels and excluding total score to wide format 
 cbcl_wide_wave2 <- cbcl_long_wave2 %>%
-  filter(category != "Total_Score_CBCL") %>%  # exclude total
+  filter(category != "Total_CBCL_Score") %>%  # exclude total
   pivot_wider(names_from = category, values_from = score)
 ```
 
