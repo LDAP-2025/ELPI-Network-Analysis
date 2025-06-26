@@ -100,11 +100,65 @@ symptom_glasso1SN <- qgraph(
   main = "CBCL Symptom Network Alcohol Use Group (Graphical Lasso, r > 0.4)")
 
 ```
+
 ## Side-by-side of stratified networks 
 ```{r side-by-side of stratified networks}
-# add here
 
+# 2 plots on top, 1 row for legend below (3 total rows)
+layout(matrix(c(1, 2, 3, 3), nrow = 2, byrow = TRUE), heights = c(4, 1))
+
+# Increase margins to leave space for titles
+par(mar = c(1, 2, 5, 2))  # bottom, left, top, right
+
+# Network 1 Alcohol Use Group 
+qgraph(
+  symptom_corr1SA,
+  graph = "glasso",
+  sampleSize = nrow(symptom_data1SA),
+  layout = "spring",
+  minimum = 0.1,
+  edge.color = "skyblue",
+  edge.width = 1.5,
+  nodeNames = colnames(symptom_corr1SA),
+  theme = "Hollywood",
+  fade = FALSE,
+  label.cex = 1.1,
+  legend = FALSE
+)
+title("Alcohol Use Group", line = 3, cex.main = 1.6, font.main = 2)
+
+# Network 2  No Alcohol Use Group 
+qgraph(
+  symptom_corr1SN,
+  graph = "glasso",
+  sampleSize = nrow(symptom_data1SN),
+  layout = "spring",
+  minimum = 0.1,
+  edge.color = "skyblue",
+  edge.width = 1.5,
+  nodeNames = colnames(symptom_corr1SN),
+  theme = "Hollywood",
+  fade = FALSE,
+  label.cex = 1.1,
+  legend = FALSE
+)
+title("No Alcohol Use Group", line = 3, cex.main = 1.6, font.main = 2)
+
+#  Legend Section
+par(mar = c(0, 0, 0, 0))
+plot.new()
+legend("center", legend = c(
+  "E_R: Emotion Regulation", "A__: Anxiety", "S_C: Somatic Complaints", "Sc_P: Social Problems",
+  "SI_P: Sleep Problems", "A_I: Attention Issues", "A_C: Aggression"
+), ncol = 3, bty = "n", cex = 1) 
 ```
+
+
+
+
+
+
+
 
 
 # Hypothesis 1
@@ -187,60 +241,6 @@ communityW1SN <- cluster_walktrap(gW1SN, weights = E(gW1SN)$weight)
 
 modularity_Q_W1SN <- modularity(communityW1SN)
 print(modularity_Q_W1SN)
-```
-
-
-#Visualisation of Stratified Networks 
-
-```{r}
-
-# 2 plots on top, 1 row for legend below (3 total rows)
-layout(matrix(c(1, 2, 3, 3), nrow = 2, byrow = TRUE), heights = c(4, 1))
-
-# Increase margins to leave space for titles
-par(mar = c(1, 2, 5, 2))  # bottom, left, top, right
-
-# Network 1 Alcohol Use Group 
-qgraph(
-  symptom_corr1SA,
-  graph = "glasso",
-  sampleSize = nrow(symptom_data1SA),
-  layout = "spring",
-  minimum = 0.1,
-  edge.color = "skyblue",
-  edge.width = 1.5,
-  nodeNames = colnames(symptom_corr1SA),
-  theme = "Hollywood",
-  fade = FALSE,
-  label.cex = 1.1,
-  legend = FALSE
-)
-title("Alcohol Use Group", line = 3, cex.main = 1.6, font.main = 2)
-
-# Network 2  No Alcohol Use Group 
-qgraph(
-  symptom_corr1SN,
-  graph = "glasso",
-  sampleSize = nrow(symptom_data1SN),
-  layout = "spring",
-  minimum = 0.1,
-  edge.color = "skyblue",
-  edge.width = 1.5,
-  nodeNames = colnames(symptom_corr1SN),
-  theme = "Hollywood",
-  fade = FALSE,
-  label.cex = 1.1,
-  legend = FALSE
-)
-title("No Alcohol Use Group", line = 3, cex.main = 1.6, font.main = 2)
-
-#  Legend Section
-par(mar = c(0, 0, 0, 0))
-plot.new()
-legend("center", legend = c(
-  "E_R: Emotion Regulation", "A__: Anxiety", "S_C: Somatic Complaints", "Sc_P: Social Problems",
-  "SI_P: Sleep Problems", "A_I: Attention Issues", "A_C: Aggression"
-), ncol = 3, bty = "n", cex = 1) 
 ```
 
 
