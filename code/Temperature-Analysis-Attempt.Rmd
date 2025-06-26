@@ -125,7 +125,7 @@ all_waves_ising <- all_waves_wide_binarised %>%
 
 
 
-# Assume your dataframe is called `df`
+
 # First, clean up column names if needed
 all_waves_ising <- all_waves_ising %>% 
   rename(id = folio, symptom = category, time = timepoint)
@@ -150,8 +150,13 @@ vars <- names(all_waves_ising)[!(names(all_waves_ising) %in% c("id", "time"))]
 #Fits a saturated multi-group Ising model: groups = "time" tells it to model each time point as a group. All parameters (edges, thresholds, temperature) are free across groups.
 model <- Ising(all_waves_ising, vars = vars, groups = "time") %>% runmodel()
 
+#This model assumes equal network structure
 model2 <- model %>% groupequal("omega") %>% runmodel
+
+#This model assumes equal threshold parameters
 model3 <- model2 %>% groupequal("tau") %>% runmodel
+
+#This model assumes equal temperature parameters
 model4 <- model3 %>% groupequal("beta") %>% runmodel
 
 ```
@@ -167,8 +172,6 @@ model_list <- list(
 
 # Compare models and sort by BIC
 comparison_results <- do.call(psychonetrics::compare, model_list)
-
-# Then sort by BIC
 comparison_results %>% arrange(BIC)
 
 # Model 2 fits just as well as the saturated model but is more parsimonious (simpler, fewer parameters). Lowest AIC and BIC — important because lower = better. RMSEA ≈ 0 — excellent fit. ChiSq diff with Model 1 = 19.58, but p = 1.0, meaning this constraint does not worsen fit
@@ -190,6 +193,7 @@ graph_smfq <- qgraph(network_smfq, layout = 'spring', labels = vars,
 ```{r Extracting temeperature}
 temp_smfq <- as.numeric(lapply(getmatrix(best_model, "beta"), 'mean'))
 
+#Extracting Standard errors and building Confidence Intervals 
 betas_est <- best_model@parameters$est[best_model@parameters$matrix == "beta"]
 betas_se <- best_model@parameters$se[best_model@parameters$matrix == "beta"]
 z = qnorm(0.975)

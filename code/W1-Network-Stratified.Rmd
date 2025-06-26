@@ -240,7 +240,7 @@ plot.new()
 legend("center", legend = c(
   "E_R: Emotion Regulation", "A__: Anxiety", "S_C: Somatic Complaints", "Sc_P: Social Problems",
   "SI_P: Sleep Problems", "A_I: Attention Issues", "A_C: Aggression"
-), ncol = 3, bty = "n", cex = 1)
+), ncol = 3, bty = "n", cex = 1) 
 ```
 
 
