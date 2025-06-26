@@ -148,17 +148,17 @@ EmR ↔ InB and EmR ↔ SmC — also important (score: 4–5)
 # Modularity measures the strength of division of a network into modules (i.e., communities or clusters). A higher Q (typically 0.3–0.7) indicates a clearer, well-separated modular structure.
 
 # Convert edge weight adjacency matrix from above to igraph object
-g <- graph_from_adjacency_matrix(edge_weights_matrix, mode = "undirected", weighted = TRUE, diag = FALSE)
+gW1 <- graph_from_adjacency_matrix(edge_weights_matrix, mode = "undirected", weighted = TRUE, diag = FALSE)
 
 #Convert edge weights to absolute values (lasso does allow for negative weight values)
-E(g)$weight <- abs(E(g)$weight)
+E(gW1)$weight <- abs(E(gW1)$weight)
 
 #Cluster_walktrap function tries to find densley connected subgraphs "communities" in a graph via random walks. The idea is that short random walks tend to stay in the same community 
-community <- cluster_walktrap(g, weights = E(g)$weight)
+communityW1 <- cluster_walktrap(gW1, weights = E(gW1)$weight)
 
 #Modularity function calculates how modular is a given division of a graph into subgraphs, from (McElroy et al) Q index >0.3 suggesting nodes are arranged in non-random communities 
 
-modularity_Q_W1 <- modularity(community)
+modularity_Q_W1 <- modularity(communityW1)
 print(modularity_Q_W1)
 ```
 
