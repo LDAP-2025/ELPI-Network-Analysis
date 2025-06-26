@@ -9,7 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-# Preliminary Hypothesis 1
+# First Preliminary Hypothesis
 ## Data Wrangling
 ```{r data wrangling}
 # Convert global strength values for all three waves into a dataframe
@@ -32,7 +32,7 @@ globalstrength$wave <- c(1, 2, 3)
 ## Visualisation
 ```{r visualisation}
 ggplot(globalstrength, aes(x = wave, y = strength)) +
-  geom_line(color = "darkmagenta", size = 1.5) +
+  geom_line(color = "darkmagenta", linewidth = 1.5) +
   geom_point(color = "darkmagenta", size = 4) + 
   labs( x = "Wave",
         y = "Global Network Strength",
@@ -43,7 +43,7 @@ ggplot(globalstrength, aes(x = wave, y = strength)) +
         axis.title.y = element_text(face = "bold", size = 14))
 ```
 
-# Stratified Hypothesis 1
+# First Stratified Hypothesis
 ## Data Wrangling
 ```{r data wrangling}
 # Convert global strength values for all three waves of the stratified networks into a dataframe
@@ -76,17 +76,18 @@ globalstrength_S <- rbind(globalstrength_W1SA_df, globalstrength_W2SA_df, global
 ```{r}
 ggplot(globalstrength_S, aes(x = wave, y = strength, colour = AlcoholUse)) +
   geom_line(size = 1.5) +
-  geom_point(size = 4)
-  
-  
-geom_line(color = "darkmagenta", size = 1.5) +
-  geom_point(color = "darkmagenta", size = 4) + 
+  geom_point(size = 4) +
+  scale_colour_manual( name = "Alcohol Use",  # Legend title
+                       values = c("A" = "forestgreen", "NA" = "darkblue"),  # Custom colors for each group
+                       labels = c("A" = "Alcohol Use", "NA" = "No Alcohol Use")) +  # Custom legend labels
   labs( x = "Wave",
         y = "Global Network Strength",
-        title = "HYPOTHESIS 1:  Global Network Strength Values Over Three Timepoints") +
+        title = "HYPOTHESIS 1:  Global Network Strength in Alcohol Use vs No Alcohol Use") +
   theme_minimal() +
-  theme(plot.title = element_text(face = "bold", size = 14, hjust = 0),
+   theme(plot.title = element_text(face = "bold", size = 14, hjust = 0),
         axis.title.x = element_text(face = "bold", size = 14),
         axis.title.y = element_text(face = "bold", size = 14))
 ```
 
+# Second Preliminary Hypothesis
+## Data Wrangling
