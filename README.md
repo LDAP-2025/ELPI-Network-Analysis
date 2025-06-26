@@ -1,5 +1,4 @@
-# ELPI Chilean Longitudinal Data Set-Network Analysis
-Dani and Greta's project  
+# ELPI Chilean Longitudinal Data Set-Network Analysis - Dani and Greta's project  
 Welcome to Network Adventures!  
 
 **Research question:**  
