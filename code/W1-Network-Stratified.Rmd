@@ -4,7 +4,7 @@ output: html_document
 date: "2025-06-17"
 ---
 
-
+# Set Up
 ```{r Load Packages}
 packages <- c("tidyverse", "haven", "dplyr","igraph", "reshape2", "qgraph")
 lapply(packages, function(pkg) {
@@ -15,16 +15,21 @@ lapply(packages, function(pkg) {
 })
 ```
 
+## Data Formatting
+```{r exclude no responses}
+alcohol_use_data_wrangled <- alcohol_use_data %>%
+  filter(g9 != 8)
+```
 
 ```{r Stratifying Data from Wave 1}
 # Filter Alcohol Use Groups 
-# Group 1: Mothers who responded with 2 or 3
-alcohol_group <- subset(alcohol_use_data, g9 %in% c(2, 3))
+# Group 1: Mothers who responded with 2 or 3 ie sporadically and regularly
+alcohol_group <- subset(alcohol_use_data_wrangled, g9 %in% c(2, 3))
 
 #total number of participants of mothers who used alcohol during pregnancy is 1088
 
-# Group 2: Mothers who responded with 1 or 8
-no_alcohol_group <- subset(alcohol_use_data, g9 %in% c(1, 8))
+# Group 2: Mothers who responded with 1 ie no use
+no_alcohol_group <- subset(alcohol_use_data_wrangled, g9 %in% c(1))
 
 #total number of participants of mothers who DO NOT report alcohol use during pregnancy is 13,913
 
@@ -36,28 +41,28 @@ W1_cbcl_no_alcohol<- merge(no_alcohol_group, cbcl_wide_wave1, by = "folio")
 ```
 
 
+# Visualisation
 
-
+## Alcohol Use 
 ```{r Network for Alcohol Use Group W1}
-
 #Plotting Network using Lasso + Centrality Analysis from (Fritz et al, 2020)}
 
 # Step 1 Create Correlation matrix (excluding 'folio')
-symptom_data1S <- W1_cbcl_alcohol_use  %>% select(-folio, -g9) #filtering participant ID 
-symptom_corr1S <- cor(symptom_data1S, use = "pairwise.complete.obs") # cor function computes the correlation between columns x and y,  "pairwise.complete.obscomputes each pairwise correlation using only the rows (observations) that have non-missing values for that pair of variables
+symptom_data1SA <- W1_cbcl_alcohol_use  %>% select(-folio, -g9) #filtering participant ID 
+symptom_corr1SA <- cor(symptom_data1SA, use = "pairwise.complete.obs") # cor function computes the correlation between columns x and y,  "pairwise.complete.obscomputes each pairwise correlation using only the rows (observations) that have non-missing values for that pair of variables
 
 # Step 2 Apply graphical lasso using qgraph
 # This automatically estimates a regularized partial correlation network
-symptom_glasso1S<- qgraph(
-  symptom_corr1S,
+symptom_glasso1SA <- qgraph(
+  symptom_corr1SA,
   graph = "glasso",#obtain an optimal sparse estimate of the partial correlation matrix using the glasso package (Friedman, Hastie and Tibshirani, 2011)
-  sampleSize = nrow(symptom_data1S),
+  sampleSize = nrow(symptom_data1SA),
   layout = "spring",  # "spring" gives a force embedded layout, other options are "circle" or "groups", in fritz paper she used "layout"
   details = TRUE,
   minimum = 0.1,      # filter edges below this value not sure if we should filter for a maximum too 
   edge.color = "skyblue",
   edge.width = 1,     # qgraph auto scales edge widths
-  nodeNames = colnames(symptom_corr1S),
+  nodeNames = colnames(symptom_corr1SA),
   theme = "Hollywood",
   fade = FALSE,
   label.cex = 1.1,
@@ -65,13 +70,121 @@ symptom_glasso1S<- qgraph(
   legend.cex= 0.5,
   main = "CBCL Symptom Network Alcohol Use Group (Graphical Lasso, r > 0.4)"
 )
+```
 
+## No Alcohol Use
+```{r}
+#Plotting Network using Lasso + Centrality Analysis from (Fritz et al, 2020)}
+
+# Step 1 Create Correlation matrix (excluding 'folio')
+symptom_data1SN <- W1_cbcl_no_alcohol  %>% select(-folio, -g9) #filtering participant ID 
+symptom_corr1SN <- cor(symptom_data1SN, use = "pairwise.complete.obs") # cor function computes the correlation between columns x and y,  "pairwise.complete.obscomputes each pairwise correlation using only the rows (observations) that have non-missing values for that pair of variables
+
+# Step 2 Apply graphical lasso using qgraph
+# This automatically estimates a regularized partial correlation network
+symptom_glasso1SN <- qgraph(
+  symptom_corr1SN,
+  graph = "glasso",#obtain an optimal sparse estimate of the partial correlation matrix using the glasso package (Friedman, Hastie and Tibshirani, 2011)
+  sampleSize = nrow(symptom_data1SN),
+  layout = "spring",  # "spring" gives a force embedded layout, other options are "circle" or "groups", in fritz paper she used "layout"
+  details = TRUE,
+  minimum = 0.1,      # filter edges below this value not sure if we should filter for a maximum too 
+  edge.color = "skyblue",
+  edge.width = 1,     # qgraph auto scales edge widths
+  nodeNames = colnames(symptom_corr1SN),
+  theme = "Hollywood",
+  fade = FALSE,
+  label.cex = 1.1,
+  legend = TRUE,
+  legend.cex= 0.5,
+  main = "CBCL Symptom Network Alcohol Use Group (Graphical Lasso, r > 0.4)")
+
+```
+## Side-by-side of stratified networks 
+```{r side-by-side of stratified networks}
+# add here
+
+```
+
+
+# Hypothesis 1
+## Alcohol Use 
+```{r Calcualting Global Network Strength}
+#Use the getWmat to extract the weight matrix (edge weights) from a qgraph object 
+edge_weights_matrixW1SA <- getWmat(symptom_glasso1SA) #In resulting adjacency matrix each cell represents the edge weight correlation between variables can be positive (direct relationship ) or negative (inverse relationship) or 0 (no edge)
+
+# Calculating global strength by using calculated edge weight adjacency matrix from above, excludes diagnoal (repeated relationships), extracts only unique edge weights, takes their absolute value and adds them all up thus global network  strength = sum of absolute edge weights
+#Once we wave the global connectivity for other waves we can compare to see if other waves have greater or decreased symptomp connectivity 
+
+global_network_strength_W1SA <- sum(abs(edge_weights_matrixW1SA[upper.tri(edge_weights_matrixW1SA)]))
+print(global_network_strength_W1SA)
+```
+
+## No Alcohol Use
+```{r Calcualting Global Network Strength}
+#Use the getWmat to extract the weight matrix (edge weights) from a qgraph object 
+edge_weights_matrixW1SN <- getWmat(symptom_glasso1SN) #In resulting adjacency matrix each cell represents the edge weight correlation between variables can be positive (direct relationship ) or negative (inverse relationship) or 0 (no edge)
+
+# Calculating global strength by using calculated edge weight adjacency matrix from above, excludes diagnoal (repeated relationships), extracts only unique edge weights, takes their absolute value and adds them all up thus global network  strength = sum of absolute edge weights
+#Once we wave the global connectivity for other waves we can compare to see if other waves have greater or decreased symptomp connectivity 
+
+global_network_strength_W1SN <- sum(abs(edge_weights_matrixW1SN[upper.tri(edge_weights_matrixW1SN)]))
+print(global_network_strength_W1SN)
+```
+
+# Hypothesis 2 and 3
+## Alcohol Use
+```{r centrality measures and EI}
 #Centrality Measure Analysis 
 #Output table gives: betweenness centrality, closeness, strength, expected influence, shortest path length 
-W1S_Centrality <- centrality_auto(symptom_glasso)
-print(W1S_Centrality)
+W1SA_Centrality <- centrality_auto(symptom_glasso1SA)
+print(W1SA_Centrality)
+```
+
+## No Alcohol Use
+```{r centrality measures and EI}
+#Centrality Measure Analysis 
+#Output table gives: betweenness centrality, closeness, strength, expected influence, shortest path length 
+W1SN_Centrality <- centrality_auto(symptom_glasso1SN)
+print(W1SN_Centrality)
 ```
 
 
+# Hypothesis 4
+## Alcohol Use
+```{r Calcualting Q-index Modularity}
+#Modularity measures the strength of division of a network into modules (i.e., communities or clusters). A higher Q (typically 0.3–0.7) indicates a clearer, well-separated modular structure.
+
+# Convert edge weight adjacency matrix from above to igraph object
+gW1SA <- graph_from_adjacency_matrix(edge_weights_matrixW1SA, mode = "undirected", weighted = TRUE, diag = FALSE)
+
+#Convert edge weights to absolute values (lasso does allow for negative weight values)
+E(gW1SA)$weight <- abs(E(gW1SA)$weight)
+
+#Cluster_walktrap function tries to find densley connected subgraphs "communities" in a graph via random walks. The idea is that short random walks tend to stay in the same community 
+communityW1SA <- cluster_walktrap(gW1SA, weights = E(gW1SA)$weight)
+
+#Modularity function calculates how modular is a given division of a graph into subgraphs, from (McElroy et al) Q index >0.3 suggesting nodes are arranged in non-random communities 
+
+modularity_Q_W1SA <- modularity(communityW1SA)
+print(modularity_Q_W1SA)
 ```
 
+## No Alcohol Use
+```{r Calcualting Q-index Modularity}
+#Modularity measures the strength of division of a network into modules (i.e., communities or clusters). A higher Q (typically 0.3–0.7) indicates a clearer, well-separated modular structure.
+
+# Convert edge weight adjacency matrix from above to igraph object
+gW1SN <- graph_from_adjacency_matrix(edge_weights_matrixW1SN, mode = "undirected", weighted = TRUE, diag = FALSE)
+
+#Convert edge weights to absolute values (lasso does allow for negative weight values)
+E(gW1SN)$weight <- abs(E(gW1SN)$weight)
+
+#Cluster_walktrap function tries to find densley connected subgraphs "communities" in a graph via random walks. The idea is that short random walks tend to stay in the same community 
+communityW1SN <- cluster_walktrap(gW1SN, weights = E(gW1SN)$weight)
+
+#Modularity function calculates how modular is a given division of a graph into subgraphs, from (McElroy et al) Q index >0.3 suggesting nodes are arranged in non-random communities 
+
+modularity_Q_W1SN <- modularity(communityW1SN)
+print(modularity_Q_W1SN)
+```
