@@ -1,0 +1,92 @@
+---
+title: "Visualisation-Preliminary-Hypotheses-1to4"
+author: "Greta Dertwinkel"
+date: "2025-06-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Preliminary Hypothesis 1
+## Data Wrangling
+```{r data wrangling}
+# Convert global strength values for all three waves into a dataframe
+globalstrength_W1_df <- as.data.frame(global_network_strength_W1)
+globalstrength_W2_df <- as.data.frame(global_network_strength_W2)
+globalstrength_W3_df <- as.data.frame(global_network_strength_W3)
+
+# Set the same column name for all three data frames
+names(globalstrength_W1_df) <- "strength"
+names(globalstrength_W2_df) <- "strength"
+names(globalstrength_W3_df) <- "strength"
+
+# Combine the dataframes into one
+globalstrength <- rbind(globalstrength_W1_df, globalstrength_W2_df, globalstrength_W3_df)
+
+# add a column containing waves
+globalstrength$wave <- c(1, 2, 3)
+```
+
+## Visualisation
+```{r visualisation}
+ggplot(globalstrength, aes(x = wave, y = strength)) +
+  geom_line(color = "darkmagenta", size = 1.5) +
+  geom_point(color = "darkmagenta", size = 4) + 
+  labs( x = "Wave",
+        y = "Global Network Strength",
+        title = "HYPOTHESIS 1:  Global Network Strength Values Over Three Timepoints") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 14, hjust = 0),
+        axis.title.x = element_text(face = "bold", size = 14),
+        axis.title.y = element_text(face = "bold", size = 14))
+```
+
+# Stratified Hypothesis 1
+## Data Wrangling
+```{r data wrangling}
+# Convert global strength values for all three waves of the stratified networks into a dataframe
+globalstrength_W1SA_df <- as.data.frame(global_network_strength_W1SA)
+globalstrength_W1SN_df <- as.data.frame(global_network_strength_W1SN)
+globalstrength_W2SA_df <- as.data.frame(global_network_strength_W2SA)
+globalstrength_W2SN_df <- as.data.frame(global_network_strength_W2SN)
+globalstrength_W3SA_df <- as.data.frame(global_network_strength_W3SA)
+globalstrength_W3SN_df <- as.data.frame(global_network_strength_W3SA)
+
+# Set the same column name for all three data frames
+names(globalstrength_W1SA_df) <- "strength"
+names(globalstrength_W1SN_df) <- "strength"
+names(globalstrength_W2SA_df) <- "strength"
+names(globalstrength_W2SN_df) <- "strength"
+names(globalstrength_W3SA_df) <- "strength"
+names(globalstrength_W3SN_df) <- "strength"
+
+# Combine the dataframes into one
+globalstrength_S <- rbind(globalstrength_W1SA_df, globalstrength_W2SA_df, globalstrength_W3SA_df,globalstrength_W1SN_df, globalstrength_W2SN_df, globalstrength_W3SN_df)
+
+# add a column containing waves
+ globalstrength_S$wave <- c(1, 2, 3, 1, 2, 3)
+ 
+ # add a column containing information on alcohol use vs no alcohol use
+ globalstrength_S$AlcoholUse <- c("A", "A", "A", "NA", "NA", "NA")
+```
+
+## Visualisation
+```{r}
+ggplot(globalstrength_S, aes(x = wave, y = strength, colour = AlcoholUse)) +
+  geom_line(size = 1.5) +
+  geom_point(size = 4)
+  
+  
+geom_line(color = "darkmagenta", size = 1.5) +
+  geom_point(color = "darkmagenta", size = 4) + 
+  labs( x = "Wave",
+        y = "Global Network Strength",
+        title = "HYPOTHESIS 1:  Global Network Strength Values Over Three Timepoints") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 14, hjust = 0),
+        axis.title.x = element_text(face = "bold", size = 14),
+        axis.title.y = element_text(face = "bold", size = 14))
+```
+
