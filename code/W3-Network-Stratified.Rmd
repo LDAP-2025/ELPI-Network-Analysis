@@ -23,10 +23,10 @@ lapply(packages, function(pkg) {
 ## Data Formatting
 ```{r Stratifying Data from Wave 3}
 #Merging Subsets with CBCL Data from Wave 2
-W1_cbcl_alcohol_use <- merge(alcohol_group, cbcl_wide_wave2, by = "folio")
+W3_cbcl_alcohol_use <- merge(alcohol_group, cbcl_wide_wave3, by = "folio")
 
 # Merge group 1 or 8 with CBCL wide data
-W1_cbcl_no_alcohol<- merge(no_alcohol_group, cbcl_wide_wave2, by = "folio")
+W3_cbcl_no_alcohol<- merge(no_alcohol_group, cbcl_wide_wave3, by = "folio")
 ```
 
 # Visualisation
@@ -36,7 +36,7 @@ W1_cbcl_no_alcohol<- merge(no_alcohol_group, cbcl_wide_wave2, by = "folio")
 #Plotting Network using Lasso + Centrality Analysis from (Fritz et al, 2020)}
 
 # Step 1 Create Correlation matrix (excluding 'folio')
-symptom_data3SA <- W1_cbcl_alcohol_use  %>% select(-folio, -g9) #filtering participant ID 
+symptom_data3SA <- W3_cbcl_alcohol_use  %>% select(-folio, -g9) #filtering participant ID 
 symptom_corr3SA <- cor(symptom_data3SA, use = "pairwise.complete.obs") # cor function computes the correlation between columns x and y,  "pairwise.complete.obscomputes each pairwise correlation using only the rows (observations) that have non-missing values for that pair of variables
 
 # Step 2 Apply graphical lasso using qgraph
@@ -65,7 +65,7 @@ symptom_glasso3SA <- qgraph(
 #Plotting Network using Lasso + Centrality Analysis from (Fritz et al, 2020)}
 
 # Step 1 Create Correlation matrix (excluding 'folio')
-symptom_data3SN <- W1_cbcl_no_alcohol  %>% select(-folio, -g9) #filtering participant ID 
+symptom_data3SN <- W3_cbcl_no_alcohol  %>% select(-folio, -g9) #filtering participant ID 
 symptom_corr3SN <- cor(symptom_data3SN, use = "pairwise.complete.obs") # cor function computes the correlation between columns x and y,  "pairwise.complete.obscomputes each pairwise correlation using only the rows (observations) that have non-missing values for that pair of variables
 
 # Step 2 Apply graphical lasso using qgraph
@@ -90,10 +90,55 @@ symptom_glasso3SN <- qgraph(
 ```
 ## Side-by-side of stratified networks 
 ```{r side-by-side of stratified networks}
-# add here
 
+# 2 plots on top, 1 row for legend below (3 total rows)
+layout(matrix(c(1, 2, 3, 3), nrow = 2, byrow = TRUE), heights = c(4, 1))
+
+# Increase margins to leave space for titles
+par(mar = c(1, 2, 5, 2))  # bottom, left, top, right
+
+# Network 1 Alcohol Use Group 
+qgraph(
+  symptom_corr3SA,
+  graph = "glasso",
+  sampleSize = nrow(symptom_data3SA),
+  layout = "spring",
+  minimum = 0.1,
+  edge.color = "skyblue",
+  edge.width = 1.5,
+  nodeNames = colnames(symptom_corr3SA),
+  theme = "Hollywood",
+  fade = FALSE,
+  label.cex = 1.1,
+  legend = FALSE
+)
+title("Alcohol Use Group", line = 3, cex.main = 1.6, font.main = 2)
+
+# Network 2  No Alcohol Use Group 
+qgraph(
+  symptom_corr3SN,
+  graph = "glasso",
+  sampleSize = nrow(symptom_data3SN),
+  layout = "spring",
+  minimum = 0.1,
+  edge.color = "skyblue",
+  edge.width = 1.5,
+  nodeNames = colnames(symptom_corr3SN),
+  theme = "Hollywood",
+  fade = FALSE,
+  label.cex = 1.1,
+  legend = FALSE
+)
+title("No Alcohol Use Group", line = 3, cex.main = 1.6, font.main = 2)
+
+#  Legend Section
+par(mar = c(0, 0, 0, 0))
+plot.new()
+legend("center", legend = c(
+  "E_R: Emotion Regulation", "A__: Anxiety", "S_C: Somatic Complaints", "Sc_P: Social Problems",
+  "SI_P: Sleep Problems", "A_I: Attention Issues", "A_C: Aggression"
+), ncol = 3, bty = "n", cex = 1) 
 ```
-
 
 # Hypothesis 1
 ## Alcohol Use 
