@@ -6,7 +6,7 @@ date: "2025-06-17"
 
 # Set Up
 ```{r Load Packages}
-packages <- c("tidyverse", "haven", "dplyr","igraph", "reshape2", "qgraph")
+packages <- c("tidyverse", "haven", "dplyr","igraph", "reshape2", "qgraph","bootnet")
 lapply(packages, function(pkg) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
     install.packages(pkg)
@@ -243,6 +243,59 @@ modularity_Q_W1SN <- modularity(communityW1SN)
 print(modularity_Q_W1SN)
 ```
 
+# Confirmatory Network Analysis Comparison
 
+#Estimating Network for W1 no alcohol and W1 alcohol use Using Bootnet Package 
+
+```{r Estimating Networks}
+
+#Create data frame clean function to  Remove 'folio' and keep only numeric columns
+clean_df <- function(df) {
+  df %>%
+    select(-folio) %>%
+    select(where(is.numeric)) %>%
+    remove_constant() %>%
+    filter(if_all(everything(), ~ is.finite(.) & !is.na(.)))
+}
+
+# Clean data using function
+numerical_W1NA <- clean_df(W1_cbcl_no_alcohol)
+numerical_W1A<- clean_df(W1_cbcl_alcohol)
+
+
+# Estimate networks
+network_w1NA <- estimateNetwork(numerical_W1NA , default = "ggmModSelect")
+network_w1A <- estimateNetwork(numerical_W1A, default = "ggmModSelect")
+
+# Visualize
+qgraph(network_w1NA$graph, layout = "spring")
+qgraph(network_w1A$graph, layout = "spring")
+
+
+```
+```{r}
+cor_mat <- cor(numerical_W1NA , use = "pairwise.complete.obs")
+summary(as.vector(cor_mat))
+any(!is.finite(cor_mat))
+
+which(!is.finite(cor_mat), arr.ind = TRUE)
+
+
+```
+
+# Model 1 
+Tests the fit of the network estimated in W1 no alcohol use  to the W1 alcohol use Network. Takes the adjacency matrix of the W1 network calculated  and test its fit to W2. 
+```{r Model 1 }
+
+#extracting the structure (adjacency matrix)
+structure_w1NA <- 1 * (network_w1NA$graph != 0)
+
+#Test how well the W1 NO ALCOHOL structure fits W1 alcohol network structure 
+model1strat <- W1_cbcl_alcohol %>%
+  select(-folio) %>%
+  ggm(estimator = "FIML", omega = structure_w1) %>% #FIML is full information maximum likelihood (default and most robust) estimator 
+  runmodel()
+
+fit(model1strat)
 
 
