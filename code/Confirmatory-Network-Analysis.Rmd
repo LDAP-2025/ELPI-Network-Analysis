@@ -1,0 +1,87 @@
+---
+title: "Confirmatory-Network-Analysis"
+output: html_document
+date: "2025-06-28"
+---
+
+This is a replication of code for Confirmatory Network Analaysis from (Piazza et al, 2024) "Polygenic Scores and Networks of Psycopathology Symptoms" available on Github. 
+
+
+```{r Setup}
+install.packages("bootnet")
+library("bootnet")
+library("psychonetrics")
+```
+
+#Estimating Network for W1 and W2 Using Bootnet Package 
+
+```{r Estimating Networks}
+# Assume cbcl_wide_wave1 and cbcl_wide_wave2 already exist from previous script in pipeline 
+network_w1 <- estimateNetwork(cbcl_wide_wave1 %>% select(-folio), default = "ggmModSelect")
+network_w2 <- estimateNetwork(cbcl_wide_wave2 %>% select(-folio), default = "ggmModSelect")
+
+#Visualise estimated Networks 
+
+qgraph(network_w1$graph, layout = "spring", theme = "colorblind")
+qgraph(network_w2$graph, layout = "spring", theme = "colorblind")
+
+```
+# Model 1 
+Tests the fit of the network estimated in W1 to the W2 Network. Takes the adjacency matrix of the W1 network calculated  and test its fit to W2. 
+```{r Model 1 }
+
+#extracting the structure (adjacency matrix)
+structure_w1 <- 1 * (network_w1$graph != 0)
+
+#Test how well the W1 structure fits W2 structure 
+model1 <- cbcl_wide_wave2 %>%
+  select(-folio) %>%
+  ggm(estimator = "FIML", omega = structure_w1) %>% #FIML is full information maximum likelihood (default and most robust) estimator 
+  runmodel()
+
+fit(model1)
+
+
+```
+
+## Interpretation
+Log-likelihoods: large gap between log1 and baseline.log 1 suggesting much better fit than the null model 
+Chi-square and p value: chisquare test significant, models fir is statistically different from perfect
+RMSEA: excellent fir <0.05
+Conclusion: Model fits the data very well, excellent fit according to RMSEA and incremental fit indices, parsimony indices are low suggesting potential overfiting 
+
+
+# Model 2 
+Comparison of Constrained vs Free Network Structures 
+Involves multi-group testing and assess whether edges have comparable weights in W1 vs W2. Combined data frame of the W1 and W2 data. Use package psychonetrics to run a model where edge weights in W1 are and W2 are set to be equal and compare it to a model where they are set free to vary. 
+
+
+```{r Model 2}
+#Creating Combined Data Frame 
+
+cbcl_wide_wave1$group <- "W1"
+cbcl_wide_wave2$group <- "W2"
+
+combined_dataW1W2 <- bind_rows(cbcl_wide_wave1, cbcl_wide_wave2)
+
+# Constrained Model Comparison
+model2 <- combined_dataW1W2 %>%
+  select(-folio, group) %>%
+  ggm(estimator = "FIML", omega = structure_w1, groups = "group") %>%
+  groupequal("omega") %>% # runs model where edges are equal in both waves 
+  runmodel()
+
+fit(model2)
+
+#Unconstrained Free  Model Comparison 
+model2_free <- combined_dataW1W2 %>%
+  select(-folio, group) %>%
+  ggm(estimator = "FIML", omega = structure_w1, groups = "group") %>%
+  runmodel()
+
+compare("constrained" = model2, "free" = model2_free)
+
+
+```
+## Interpretation
+Chi squre difference test: comparison between the free and constrained model is statistically signficiant p< 0.0001, thus the 
