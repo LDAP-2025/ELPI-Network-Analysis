@@ -1,31 +1,6 @@
 # ELPI Chilean Longitudinal Data: A Network Model of Socio-emotional development markers for children with and without prenatal exposure to alcohol
 Greta and Daniela  
 
-## Pipeline 
-This [script](code/Analysis_Pipeline.R) runs all subsequent scripts in the analysis. 
-
-## Data Set up and Wrangling 
-This [script](code/Network_DataWrangling.Rmd) loads and inspects data, filtering data for variables of interest to be used in network analysis. 
-
-## Networks without Stratification 
-Each of the following respective scripts plots newtork of CBCL subscale raw scores using qgraph and preforms centrality analysis.  
-For W1 [script](code/W1-Network.Rmd)  
-For W2 [script](code/W2-Network.Rmd)  
-For W3 [script](code/W3-Network.Rmd)  
-
-## Stratified Networks 
-Each of the following respective scripts stratifies data based on alcohol vs no-alcohol use during prenatal period and  plots newtork of CBCL subscale raw scores using qgraph and preforms centrality analysis.   
-For W1 [script](code/W1-Network-Stratified.Rmd)   
-For W2 [script](code/W2-Network-Stratified.Rmd)   
-For W3 [script](code/W3-Network-Stratified.Rmd)   
-
-## Temperature Analysis 
-This [script](code/Temperature-Analysis-Attempt.Rmd) imputes  CBCL scores to binary values and reshapes data for ising model, it then fits multi-group ising models, creates model list and compares by BIC, plots the network of the best model, extracts temperature value and plots temperature value. 
-
-
-## Visualisation Non-Stratified Network Results
-This [script](code/Visualisation-Preliminary-Hypotheses-1to4.Rmd) plots combined visualsiaiton of results of W1-3 for all preliminary hypothesis. 
-
 ## Study  Design 
 
 ### Data Set Description 
@@ -48,3 +23,25 @@ How does alcohol intake during pregnancy affect children's socio-emotional devel
 	3. Changes in centrality vary by prenatal exposure to alcohol.  
 	4. Changes in modularity vary by prenatal exposure to alcohol.  
 	5. Changes in temperature vary by prenatal exposure to alcohol. 
+
+
+## Pipeline 
+This [script](code/Analysis_Pipeline.R) runs all subsequent scripts in the analysis. 
+
+## Data Set up and Wrangling 
+This [script](code/Network_DataWrangling.Rmd) loads and inspects data, filtering data for variables of interest to be used in network analysis. 
+
+## Networks without Stratification 
+Each of the following respective scripts plots newtork of CBCL subscale raw scores using qgraph and preforms centrality analysis.  
+For W1 [script](code/W1-Network.Rmd)  
+For W2 [script](code/W2-Network.Rmd)  
+For W3 [script](code/W3-Network.Rmd)  
+
+## Stratified Networks 
+Each of the following respective scripts stratifies data based on alcohol vs no-alcohol use during prenatal period and  plots newtork of CBCL subscale raw scores using qgraph and preforms centrality analysis.   
+For W1 [script](code/W1-Network-Stratified.Rmd)   
+For W2 [script](code/W2-Network-Stratified.Rmd)   
+For W3 [script](code/W3-Network-Stratified.Rmd)   
+
+## Temperature Analysis 
+This [script](code/Temperature-Analysis-Attempt.Rmd) imputes  CBCL scores to binary values and reshapes data for ising model, it then fits multi-group ising models, creates model list and compares by BIC, plots the network of the best model, extracts temperature value and plots temperature value. 
