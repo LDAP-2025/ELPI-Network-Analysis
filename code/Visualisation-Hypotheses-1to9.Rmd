@@ -1,0 +1,343 @@
+---
+title: "Visualisation-Hypotheses-1to9"
+author: "Greta Dertwinkel"
+date: "2025-06-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# First Preliminary Hypothesis
+## Data Wrangling
+```{r H1-data wrangling}
+# Convert global strength values for all three waves into a dataframe
+globalstrength_W1_df <- as.data.frame(global_network_strength_W1)
+globalstrength_W2_df <- as.data.frame(global_network_strength_W2)
+globalstrength_W3_df <- as.data.frame(global_network_strength_W3)
+
+# Set the same column name for all three data frames
+names(globalstrength_W1_df) <- "strength"
+names(globalstrength_W2_df) <- "strength"
+names(globalstrength_W3_df) <- "strength"
+
+# Combine the dataframes into one
+globalstrength <- rbind(globalstrength_W1_df, globalstrength_W2_df, globalstrength_W3_df)
+
+# add a column containing waves
+globalstrength$wave <- c(1, 2, 3)
+```
+
+## Visualisation
+```{r H1-visualisation}
+ggplot(globalstrength, aes(x = wave, y = strength)) +
+  geom_line(color = "darkmagenta", linewidth = 1.5) +
+  geom_point(color = "darkmagenta", size = 4) + 
+  labs( x = "Wave",
+        y = "Global Network Strength",
+        title = "HYPOTHESIS 1:  Global Network Strength Values Over Three Timepoints") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 14, hjust = 0),
+        axis.title.x = element_text(face = "bold", size = 14),
+        axis.title.y = element_text(face = "bold", size = 14))
+```
+
+# First Stratified Hypothesis
+## Data Wrangling
+```{r H6-data wrangling}
+# Convert global strength values for all three waves of the stratified networks into a dataframe
+globalstrength_W1SA_df <- as.data.frame(global_network_strength_W1SA)
+globalstrength_W1SN_df <- as.data.frame(global_network_strength_W1SN)
+globalstrength_W2SA_df <- as.data.frame(global_network_strength_W2SA)
+globalstrength_W2SN_df <- as.data.frame(global_network_strength_W2SN)
+globalstrength_W3SA_df <- as.data.frame(global_network_strength_W3SA)
+globalstrength_W3SN_df <- as.data.frame(global_network_strength_W3SA)
+
+# Set the same column name for all three data frames
+names(globalstrength_W1SA_df) <- "strength"
+names(globalstrength_W1SN_df) <- "strength"
+names(globalstrength_W2SA_df) <- "strength"
+names(globalstrength_W2SN_df) <- "strength"
+names(globalstrength_W3SA_df) <- "strength"
+names(globalstrength_W3SN_df) <- "strength"
+
+# Combine the dataframes into one
+globalstrength_S <- rbind(globalstrength_W1SA_df, globalstrength_W2SA_df, globalstrength_W3SA_df,globalstrength_W1SN_df, globalstrength_W2SN_df, globalstrength_W3SN_df)
+
+# add a column containing waves
+ globalstrength_S$wave <- c(1, 2, 3, 1, 2, 3)
+ 
+ # add a column containing information on alcohol use vs no alcohol use
+ globalstrength_S$AlcoholUse <- c("A", "A", "A", "NA", "NA", "NA")
+```
+
+## Visualisation
+```{r H6-visualisation}
+ggplot(globalstrength_S, aes(x = wave, y = strength, colour = AlcoholUse)) +
+  geom_line(size = 1.5) +
+  geom_point(size = 4) +
+  scale_colour_manual( name = "Alcohol Use",  # Legend title
+                       values = c("A" = "forestgreen", "NA" = "darkblue"),  # Custom colors for each group
+                       labels = c("A" = "Alcohol Use", "NA" = "No Alcohol Use")) +  # Custom legend labels
+  labs( x = "Wave",
+        y = "Global Network Strength",
+        title = "HYPOTHESIS 1:  Global Network Strength in Alcohol Use vs No Alcohol Use") +
+  theme_minimal() +
+   theme(plot.title = element_text(face = "bold", size = 14, hjust = 0),
+        axis.title.x = element_text(face = "bold", size = 14),
+        axis.title.y = element_text(face = "bold", size = 14))
+```
+
+# Second and Third Preliminary Hypothesis
+
+## Data Wrangling
+```{r H2and3-datawrangling}
+# Convert centrality measures for all three waves into a dataframe and select only node centrality measures
+centralitymeasures_W1_df <- as.data.frame(W1_Centrality) %>%
+  select(node.centrality.Betweenness, node.centrality.Closeness, node.centrality.Strength, node.centrality.ExpectedInfluence) %>%
+  unique() # keep only one row per node
+centralitymeasures_W2_df <- as.data.frame(W2_Centrality) %>%
+  select(node.centrality.Betweenness, node.centrality.Closeness, node.centrality.Strength, node.centrality.ExpectedInfluence) %>%
+  unique() # keep only one row per node
+centralitymeasures_W3_df <- as.data.frame(W3_Centrality) %>%
+  select(node.centrality.Betweenness, node.centrality.Closeness, node.centrality.Strength, node.centrality.ExpectedInfluence) %>%
+  unique() # keep only one row per node
+
+# add a column containing the node of the measurement
+centralitymeasures_W1_df$node <- c("ER", "AD", "SC", "ScP", "SlP", "AI", "AGR")
+centralitymeasures_W2_df$node <- c("ER", "AD", "SC", "ScP", "SlP", "AI", "AGR")
+centralitymeasures_W3_df$node <- c("ER", "AD", "SC", "ScP", "SlP", "AI", "AGR")
+
+# add a column containing information about the wave of the measurement
+centralitymeasures_W1_df$wave <- c(1, 1, 1, 1, 1, 1, 1)
+centralitymeasures_W2_df$wave <- c(2, 2, 2, 2, 2, 2, 2)
+centralitymeasures_W3_df$wave <- c(3, 3, 3, 3, 3, 3, 3)
+
+# Combine the dataframes into one and convert into long format
+centralitymeasures <- rbind(centralitymeasures_W1_df, centralitymeasures_W2_df, centralitymeasures_W3_df) %>%
+  pivot_longer(cols = starts_with("node.centrality"), 
+               names_to = "centrality_type", 
+               values_to = "centrality_value") %>%
+  mutate(centrality_type = case_when(
+    centrality_type == "node.centrality.Betweenness" ~ "Betweenness",
+    centrality_type == "node.centrality.Closeness" ~ "Closeness",
+    centrality_type == "node.centrality.Strength" ~ "Strength",
+    centrality_type == "node.centrality.ExpectedInfluence" ~ "EI",
+    TRUE ~ centrality_type))
+```
+
+## Visualisation
+```{r H2and3-datavisualisation}
+# Define custom colors for waves
+wave_colors <- c("1" = "#D55E00",  # red-orange
+                 "2" = "#0072B2",  # blue
+                 "3" = "#CC79A7")  # purple
+
+# Plot importance of each centrality measures across three waves
+ggplot(centralitymeasures, aes(x = node, y = centrality_value, color = as.factor(wave), group = wave)) +
+  geom_line(linewidth = 1) +
+  geom_point(aes(shape = as.factor(wave)), size = 2) +
+  facet_wrap(~ centrality_type, scales = "free_y", ncol = 1,
+             labeller = as_labeller(c(
+               "Betweenness" = "Betweenness",
+               "Closeness" = "Closeness",
+               "Strength" = "Strength",
+               "EI" = "Expected Influence" ))) +
+  scale_color_manual(values = wave_colors) +
+  labs( title = "Centrality Indices Demonstrating Importance of Each Symptom Over Time",
+        x = "Symptom",
+        y = "Centrality Score",
+        color = "Wave",
+        shape = "Wave") +
+  theme_minimal(base_size = 13) +
+  theme( plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+         axis.text.x = element_text(angle = 45, hjust = 1),
+         strip.text = element_text(face = "bold"))
+
+
+# Plot centrality of each node across time
+ggplot(centralitymeasures, aes(x = as.factor(wave), y = centrality_value, group = node)) +
+  geom_line(linewidth = 1, aes(group = 1), color = "darkmagenta") +
+  geom_point(size = 2, color = "darkmagenta") +
+  facet_grid(centrality_type ~ node, scales = "free_y") +
+  scale_color_manual(values = wave_colors) +  # reuse your custom colors
+  labs( title = "Centrality of Each Symptom Over Time",
+        x = "Wave",
+        y = "Centrality Score",
+        color = "Wave") +
+  theme_minimal(base_size = 12) +
+  theme(
+    plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    strip.text.x = element_text(size = 10, face = "bold"),
+    strip.text.y = element_text(size = 10, face = "bold"))
+```
+
+# Second and Third Stratified Hypothesis
+## Data Wrangling
+```{r H7and8-datawrangling}
+# Convert centrality measures for all three waves into a dataframe and select only node centrality measures
+centralitymeasures_W1SA_df <- as.data.frame(W1SA_Centrality) %>%
+  select(node.centrality.Betweenness, node.centrality.Closeness, node.centrality.Strength, node.centrality.ExpectedInfluence) %>%
+  unique() # keep only one row per node
+
+centralitymeasures_W1SN_df <- as.data.frame(W1SN_Centrality) %>%
+  select(node.centrality.Betweenness, node.centrality.Closeness, node.centrality.Strength, node.centrality.ExpectedInfluence) %>%
+  unique() # keep only one row per node
+
+centralitymeasures_W2SA_df <- as.data.frame(W2SA_Centrality) %>%
+  select(node.centrality.Betweenness, node.centrality.Closeness, node.centrality.Strength, node.centrality.ExpectedInfluence) %>%
+  unique() # keep only one row per node
+
+centralitymeasures_W2SN_df <- as.data.frame(W2SN_Centrality) %>%
+  select(node.centrality.Betweenness, node.centrality.Closeness, node.centrality.Strength, node.centrality.ExpectedInfluence) %>%
+  unique() # keep only one row per node
+
+centralitymeasures_W3SA_df <- as.data.frame(W3SA_Centrality) %>%
+  select(node.centrality.Betweenness, node.centrality.Closeness, node.centrality.Strength, node.centrality.ExpectedInfluence) %>%
+  unique() # keep only one row per node
+
+centralitymeasures_W3SN_df <- as.data.frame(W3SN_Centrality) %>%
+  select(node.centrality.Betweenness, node.centrality.Closeness, node.centrality.Strength, node.centrality.ExpectedInfluence) %>%
+  unique() # keep only one row per node
+
+# add a column containing the node of the measurement
+centralitymeasures_W1SA_df$node <- c("ER", "AD", "SC", "ScP", "SlP", "AI", "AGR")
+centralitymeasures_W1SN_df$node <- c("ER", "AD", "SC", "ScP", "SlP", "AI", "AGR")
+centralitymeasures_W2SA_df$node <- c("ER", "AD", "SC", "ScP", "SlP", "AI", "AGR")
+centralitymeasures_W2SN_df$node <- c("ER", "AD", "SC", "ScP", "SlP", "AI", "AGR")
+centralitymeasures_W3SA_df$node <- c("ER", "AD", "SC", "ScP", "SlP", "AI", "AGR")
+centralitymeasures_W3SN_df$node <- c("ER", "AD", "SC", "ScP", "SlP", "AI", "AGR")
+
+# add a column containing information about the wave of the measurement
+centralitymeasures_W1SA_df$wave <- c(1, 1, 1, 1, 1, 1, 1)
+centralitymeasures_W1SN_df$wave <- c(1, 1, 1, 1, 1, 1, 1)
+centralitymeasures_W2SA_df$wave <- c(2, 2, 2, 2, 2, 2, 2)
+centralitymeasures_W2SN_df$wave <- c(2, 2, 2, 2, 2, 2, 2)
+centralitymeasures_W3SA_df$wave <- c(3, 3, 3, 3, 3, 3, 3)
+centralitymeasures_W3SN_df$wave <- c(3, 3, 3, 3, 3, 3, 3)
+
+ # add a column containing information on alcohol use vs no alcohol use
+centralitymeasures_W1SA_df$AlcoholUse <- c("A", "A", "A", "A", "A", "A", "A")
+centralitymeasures_W2SA_df$AlcoholUse <- c("A", "A", "A", "A", "A", "A", "A")
+centralitymeasures_W3SA_df$AlcoholUse <- c("A", "A", "A", "A", "A", "A", "A")
+centralitymeasures_W1SN_df$AlcoholUse <- c("NA", "NA", "NA", "NA", "NA", "NA", "NA")
+centralitymeasures_W2SN_df$AlcoholUse <- c("NA", "NA", "NA", "NA", "NA", "NA", "NA")
+centralitymeasures_W3SN_df$AlcoholUse <- c("NA", "NA", "NA", "NA", "NA", "NA", "NA")
+
+ 
+# Combine the dataframes into one and convert into long format
+centralitymeasures_S <- rbind(centralitymeasures_W1SA_df, centralitymeasures_W2SA_df, centralitymeasures_W3SA_df, centralitymeasures_W1SN_df, centralitymeasures_W2SN_df, centralitymeasures_W3SN_df) %>%
+  pivot_longer(cols = starts_with("node.centrality"), 
+               names_to = "centrality_type", 
+               values_to = "centrality_value") %>%
+  mutate(centrality_type = case_when(
+    centrality_type == "node.centrality.Betweenness" ~ "Betweenness",
+    centrality_type == "node.centrality.Closeness" ~ "Closeness",
+    centrality_type == "node.centrality.Strength" ~ "Strength",
+    centrality_type == "node.centrality.ExpectedInfluence" ~ "EI",
+    TRUE ~ centrality_type))
+```
+
+## Visualisation
+```{r H7and8-visualisation}
+# Plot centrality of each node across time for alcohol use vs no alcohol use
+ggplot(centralitymeasures, aes(x = as.factor(wave), y = centrality_value, color = as.factor(AlcoholUse), group = interaction(node, AlcoholUse))) +
+  geom_line(linewidth = 1) +
+  geom_point(size = 2) +
+  facet_grid(centrality_type ~ node, scales = "free_y") +
+  scale_color_manual( values = c("NA" = "steelblue", "A" = "darkorange"),
+                      labels = c("No Alcohol Use", "Alcohol Use"),
+                      name = "Alcohol Use") +
+  labs(title = "Centrality of Each Symptom Over Time by Alcohol Use",
+       x = "Wave",
+       y = "Centrality Score") +
+  theme_minimal(base_size = 12) +
+  theme( plot.title = element_text(face = "bold", size = 16, hjust = 0.5),
+         axis.text.x = element_text(angle = 45, hjust = 1),
+         strip.text.x = element_text(size = 10, face = "bold"),
+         strip.text.y = element_text(size = 10, face = "bold"))
+```
+
+# Fourth Preliminary Hypothesis
+## Data Wrangling
+```{r H4-datawrangling}
+# Convert global strength values for all three waves into a dataframe
+modularity_W1_df <- as.data.frame(modularity_Q_W1)
+modularity_W2_df <- as.data.frame(modularity_Q_W2)
+modularity_W3_df <- as.data.frame(modularity_Q_W3)
+
+# Set the same column name for all three data frames
+names(modularity_W1_df) <- "modularity"
+names(modularity_W2_df) <- "modularity"
+names(modularity_W3_df) <- "modularity"
+
+# Combine the dataframes into one
+modularity <- rbind(modularity_W1_df, modularity_W2_df, modularity_W3_df)
+
+# add a column containing waves
+modularity$wave <- c(1, 2, 3)
+```
+
+## Visualisation
+```{r H4-visualisation}
+ggplot(modularity, aes(x = wave, y = modularity)) +
+  geom_line(color = "darkmagenta", linewidth = 1.5) +
+  geom_point(color = "darkmagenta", size = 4) + 
+  labs( x = "Wave",
+        y = "Modularity (Q-Index)",
+        title = "HYPOTHESIS 4:  Modularity Values Over Three Timepoints") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 14, hjust = 0),
+        axis.title.x = element_text(face = "bold", size = 14),
+        axis.title.y = element_text(face = "bold", size = 14))
+```
+
+# Fourth Stratified Hypothesis
+## Data Wrangling
+```{r H9-datawrangling}
+# Convert global strength values for all three waves of the stratified networks into a dataframe
+modularity_W1SA_df <- as.data.frame(modularity_Q_W1SA)
+modularity_W1SN_df <- as.data.frame(modularity_Q_W1SN)
+modularity_W2SA_df <- as.data.frame(modularity_Q_W2SA)
+modularity_W2SN_df <- as.data.frame(modularity_Q_W2SN)
+modularity_W3SA_df <- as.data.frame(modularity_Q_W3SA)
+modularity_W3SN_df <- as.data.frame(modularity_Q_W3SN)
+
+# Set the same column name for all three data frames
+names(modularity_W1SA_df) <- "modularity"
+names(modularity_W1SN_df) <- "modularity"
+names(modularity_W2SA_df) <- "modularity"
+names(modularity_W2SN_df) <- "modularity"
+names(modularity_W3SA_df) <- "modularity"
+names(modularity_W3SN_df) <- "modularity"
+
+# Combine the dataframes into one
+modularity_S <- rbind(modularity_W1SA_df, modularity_W1SN_df, modularity_W2SA_df, modularity_W2SN_df, modularity_W3SA_df, modularity_W3SN_df)
+
+
+# add a column containing waves
+ modularity_S$wave <- c(1, 1, 2, 2, 3, 3)
+ 
+ # add a column containing information on alcohol use vs no alcohol use
+modularity_S$AlcoholUse <- c("A", "NA", "A", "NA", "A", "NA")
+```
+
+## Visualisation
+```{r H9-visualisation}
+ggplot(modularity_S, aes(x = wave, y = modularity, colour = AlcoholUse)) +
+  geom_line(size = 1.5) +
+  geom_point(size = 4) +
+  scale_colour_manual( name = "Alcohol Use",  # Legend title
+                       values = c("A" = "forestgreen", "NA" = "darkblue"),  # Custom colors for each group
+                       labels = c("A" = "Alcohol Use", "NA" = "No Alcohol Use")) +  # Custom legend labels
+  labs( x = "Wave",
+        y = "Modularity(Q-index)",
+        title = "HYPOTHESIS 9: Modularity in Alcohol Use vs No Alcohol Use Symptom Networks") +
+  theme_minimal() +
+   theme(plot.title = element_text(face = "bold", size = 14, hjust = 0),
+        axis.title.x = element_text(face = "bold", size = 14),
+        axis.title.y = element_text(face = "bold", size = 14))
+```
+

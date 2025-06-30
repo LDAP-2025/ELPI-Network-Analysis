@@ -44,11 +44,11 @@ g <- graph_from_data_frame(corr_edges, directed = FALSE)
 
 #Renaming Variables for Plotting of Network 
 name_mapping <- c(
-  "Attention_Issues" = "AT",
+  "Attention_Issues" = "AI",
   "Agressive_Conduct" = "AGR",
-  "Sleep_Problems" = "SP",
+  "Sleep_Problems" = "SlP",
   "Emotional_Reactivity" = "ER",
-  "Social_Problems" = "SC",
+  "Social_Problems" = "SoC",
   "Anxiety_or_Depression" = "AD",
   "Somatic_Complaints" = "SC")
 
