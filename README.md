@@ -9,6 +9,18 @@ The ELPI — Encuesta Longitudinal de Protección Social (Chilean Longitudinal S
 ### Research question: 
 How does alcohol intake during pregnancy affect children's socio-emotional development longitudinally?  
 
+#### Variables of Interest 
+Prenatal Alcohol intake   
+- Reported by mothers in questionaries item g9 in W1  
+- Question asked: During your pregnancy did you consume any alcoholic beverage including wine, beer, pisco or other licor? Answers available were: 
+  	-  1.Never 2.Sporadically 3. Regularly or 8. No Response  
+
+Children's socio-emotional development   
+- The CBCL (CHILD BEHAVIOUR CHECKLIST)
+- 7 empirically-based syndrome scales, which summarize common patterns of behavioral and emotional problems.
+- Anxious/depressed, Withdrawn/depresesed, Somatic Complaints, Social Problems, Thought Problems, Attention Problems, Rule-Breaking Agressive Behaviour
+ 
+
  
 ### Preliminary Hypotheses: 
 	1. Networks become more closely connected over time (global network strength).  
