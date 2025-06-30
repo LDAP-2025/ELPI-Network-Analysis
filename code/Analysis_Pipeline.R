@@ -26,4 +26,3 @@ rmarkdown::render("code/W3-Network-Stratified.Rmd")
 # ==== 8: Temperature Analysis ====
 rmarkdown::render("code/Temperature-Analysis-Attempt.Rmd")
 
-getwd()
