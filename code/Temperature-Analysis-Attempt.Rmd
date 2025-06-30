@@ -226,4 +226,7 @@ ggplot(alspac_temp_data, aes(x = Time, y = Temperature)) +
   theme_minimal()
 
 ```
-
+Interpretation
+- Temperature is and indicator of network stability, with higher values indicating less symptom alignment and lower values indicating greater variability. 
+-Previous literature has shown temperature of depression symptom networks decrease across adolescence 
+-These results show alligning findings as across the 3 waves the CBCL scores became more characteristically stable as measured through network temperature 
