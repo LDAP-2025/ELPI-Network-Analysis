@@ -92,7 +92,7 @@ data_wave3 <- raw_data_wave3 %>%
 ```
 
 ## Format Wave 3 Data into Long Format
-```{r long-format-wave1}
+```{r }
 #Convert cbcl to Long format for Wave 1 data 
 cbcl_long_wave3 <- data_wave3 %>%
   pivot_longer( cols = -folio,
