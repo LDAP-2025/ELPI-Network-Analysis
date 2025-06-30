@@ -4,7 +4,7 @@ Greta and Daniela
 ## Study  Design 
 
 ### Data Set Description 
-The ELPI — Encuesta Longitudinal de Protección Social (Chilean Longitudinal Social Protection Survey) — is a nationally representative panel survey conducted in Chile. It was designed to gather long-term, multidimensional data on individuals, households, and their interactions with the social protection system. Initiated in 2002, with follow-up waves in 2004, 2006, 2009, 2012, 2015, and beyond tracking the same individuals. 
+The ELPI — Encuesta Longitudinal de Protección Social (Chilean Longitudinal Social Protection Survey) — is a nationally representative panel survey conducted in Chile. It was designed to gather long-term, multidimensional data on individuals, households, and their interactions with the social protection system. Initiated in 2010, with follow-up waves in 2012, 2017, and 2024 tracking the same individuals. 
 
 ### Research question: 
 How does alcohol intake during pregnancy affect children's socio-emotional development longitudinally?  
