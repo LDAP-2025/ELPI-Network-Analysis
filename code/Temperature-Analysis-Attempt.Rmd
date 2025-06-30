@@ -69,7 +69,7 @@ Still doesnt make much sense if withdrawn attention problems and agressive behav
 ```{r Imputing CBCL Raw Score to Binary Values }
 
 # List of CBCL categories (as they appear *before* the .1/.2/.3 suffix)
-categories <- c("Emotional Reactivity", "Anxious/Depressed", "Somatic Complaints","Internalising Behaviours", "Sleep Problems", "Attention Issues", "Agressive Conduct")
+categories <- c("Emotional_Reactivity", "Anxiety_or_Depression", "Somatic_Complaints","Social_Problems", "Sleep_Problems", "Attention_Issues", "Agressive_Conduct")
 
 # Number of waves
 waves <- 1:3
@@ -96,8 +96,7 @@ all_waves_wide_binarised <- all_waves_wide %>%
 ```
 
 ```{r Exploring Values after Imputation}
-categories <- c("Emotional Reactivity", "Anxious/Depressed", "Somatic Complaints", 
-                "Withdrawn", "Sleep Problems", "Attention Problems", "Aggressive Behavior")
+categories <- c("Emotional_Reactivity", "Anxiety_or_Depression", "Somatic_Complaints","Social_Problems", "Sleep_Problems", "Attention_Issues", "Agressive_Conduct")
 
 for (cat in categories) {
   # Build the binary column names across waves
@@ -142,10 +141,11 @@ all_waves_ising <- all_waves_ising %>%
 ```
 
 ```{r, Fitting Multi-group Ising Models}
-all_waves_ising <- all_waves_ising %>% drop_na(all_of(vars))
+
 
 #Listing the nodes in the network 
 vars <- names(all_waves_ising)[!(names(all_waves_ising) %in% c("id", "time"))]
+all_waves_ising <- all_waves_ising %>% drop_na(all_of(vars))
 
 #Fits a saturated multi-group Ising model: groups = "time" tells it to model each time point as a group. All parameters (edges, thresholds, temperature) are free across groups.
 model <- Ising(all_waves_ising, vars = vars, groups = "time") %>% runmodel()
@@ -181,12 +181,19 @@ best_model <- model2
 
 
 ```{r Plotting Network of best model}
-# extract edge weights and plot the network
+
+# Expand the top margin to make room for the title
+par(mar = c(5, 4, 8, 2))  # Increase top margin (third value)
+
+# Extract edge weights and plot the network
 all_network_smfq <- getmatrix(best_model, "omega")
 network_smfq <- getmatrix(best_model, "omega")[[1]]
+
 graph_smfq <- qgraph(network_smfq, layout = 'spring', labels = vars, 
-                     theme = 'colorblind', label.prop=0.99, node.width=1.4, 
-                     label.norm='000000')
+                     theme = 'colorblind', label.prop = 0.99, node.width = 1.4, 
+                     label.norm = '000000')
+title("Ising Model Comparison:\nM2 Omega Group Equality Constrains", cex.main = 0.8, line = 6)
+
 ```
 
 
