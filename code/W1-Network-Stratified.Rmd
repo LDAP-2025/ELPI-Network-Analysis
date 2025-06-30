@@ -175,7 +175,7 @@ print(global_network_strength_W1SA)
 ```
 
 ## No Alcohol Use
-```{r Calcualting Global Network Strength}
+```{r Calcualting Global Network Strength NAU}
 #Use the getWmat to extract the weight matrix (edge weights) from a qgraph object 
 edge_weights_matrixW1SN <- getWmat(symptom_glasso1SN) #In resulting adjacency matrix each cell represents the edge weight correlation between variables can be positive (direct relationship ) or negative (inverse relationship) or 0 (no edge)
 
@@ -196,7 +196,7 @@ print(W1SA_Centrality)
 ```
 
 ## No Alcohol Use
-```{r centrality measures and EI}
+```{r centrality measures and EI NAU}
 #Centrality Measure Analysis 
 #Output table gives: betweenness centrality, closeness, strength, expected influence, shortest path length 
 W1SN_Centrality <- centrality_auto(symptom_glasso1SN)
@@ -225,7 +225,7 @@ print(modularity_Q_W1SA)
 ```
 
 ## No Alcohol Use
-```{r Calcualting Q-index Modularity}
+```{r Calcualting Q-index Modularity NAU}
 #Modularity measures the strength of division of a network into modules (i.e., communities or clusters). A higher Q (typically 0.3–0.7) indicates a clearer, well-separated modular structure.
 
 # Convert edge weight adjacency matrix from above to igraph object
