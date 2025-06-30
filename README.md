@@ -43,5 +43,8 @@ For W1 [script](code/W1-Network-Stratified.Rmd)
 For W2 [script](code/W2-Network-Stratified.Rmd)   
 For W3 [script](code/W3-Network-Stratified.Rmd)   
 
+## Confirmatory Network Structure Analysis
+This [script](code/Confirmatory-Network-Analysis.Rmd) estimates the network for W1 and W2 Using Bootnet package, visualises the estimated network, Runs model 1: tests the fit of the network structure using adjacency matric of W1, and Runs model 2: comparison of contstrained vs free network structures  
+
 ## Temperature Analysis 
 This [script](code/Temperature-Analysis-Attempt.Rmd) imputes  CBCL scores to binary values and reshapes data for ising model, it then fits multi-group ising models, creates model list and compares by BIC, plots the network of the best model, extracts temperature value and plots temperature value. 
