@@ -23,10 +23,10 @@ lapply(packages, function(pkg) {
 ## Data Formatting
 ```{r Stratifying Data from Wave 3}
 #Merging Subsets with CBCL Data from Wave 2
-W3_cbcl_alcohol_use <- merge(alcohol_group, cbcl_wide_wave3, by = "folio")
+W3_cbcl_alcohol_use <- merge(alcohol_use_data, cbcl_wide_wave2, by = "folio")
 
 # Merge group 1 or 8 with CBCL wide data
-W3_cbcl_no_alcohol<- merge(no_alcohol_group, cbcl_wide_wave3, by = "folio")
+W3_cbcl_no_alcohol<- merge(no_alcohol_group, cbcl_wide_wave2, by = "folio")
 ```
 
 # Visualisation
@@ -37,6 +37,7 @@ W3_cbcl_no_alcohol<- merge(no_alcohol_group, cbcl_wide_wave3, by = "folio")
 
 # Step 1 Create Correlation matrix (excluding 'folio')
 symptom_data3SA <- W3_cbcl_alcohol_use  %>% select(-folio, -g9) #filtering participant ID 
+symptom_data3SA <- symptom_data3SA %>% select(where(is.numeric)) # Remove non-numeric columns
 symptom_corr3SA <- cor(symptom_data3SA, use = "pairwise.complete.obs") # cor function computes the correlation between columns x and y,  "pairwise.complete.obscomputes each pairwise correlation using only the rows (observations) that have non-missing values for that pair of variables
 
 # Step 2 Apply graphical lasso using qgraph
@@ -66,6 +67,7 @@ symptom_glasso3SA <- qgraph(
 
 # Step 1 Create Correlation matrix (excluding 'folio')
 symptom_data3SN <- W3_cbcl_no_alcohol  %>% select(-folio, -g9) #filtering participant ID 
+symptom_data3SN <- symptom_data3SN %>% select(where(is.numeric)) # Remove non-numeric columns
 symptom_corr3SN <- cor(symptom_data3SN, use = "pairwise.complete.obs") # cor function computes the correlation between columns x and y,  "pairwise.complete.obscomputes each pairwise correlation using only the rows (observations) that have non-missing values for that pair of variables
 
 # Step 2 Apply graphical lasso using qgraph

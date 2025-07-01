@@ -49,6 +49,7 @@ W1_cbcl_no_alcohol<- merge(no_alcohol_group, cbcl_wide_wave1, by = "folio")
 
 # Step 1 Create Correlation matrix (excluding 'folio')
 symptom_data1SA <- W1_cbcl_alcohol_use  %>% select(-folio, -g9) #filtering participant ID 
+symptom_data1SA <- symptom_data1SA %>% select(where(is.numeric)) # Remove non-numeric columns
 symptom_corr1SA <- cor(symptom_data1SA, use = "pairwise.complete.obs") # cor function computes the correlation between columns x and y,  "pairwise.complete.obscomputes each pairwise correlation using only the rows (observations) that have non-missing values for that pair of variables
 
 # Step 2 Apply graphical lasso using qgraph
@@ -78,6 +79,7 @@ symptom_glasso1SA <- qgraph(
 
 # Step 1 Create Correlation matrix (excluding 'folio')
 symptom_data1SN <- W1_cbcl_no_alcohol  %>% select(-folio, -g9) #filtering participant ID 
+symptom_data1SN <- symptom_data1SN %>% select(where(is.numeric)) # Remove non-numeric columns
 symptom_corr1SN <- cor(symptom_data1SN, use = "pairwise.complete.obs") # cor function computes the correlation between columns x and y,  "pairwise.complete.obscomputes each pairwise correlation using only the rows (observations) that have non-missing values for that pair of variables
 
 # Step 2 Apply graphical lasso using qgraph

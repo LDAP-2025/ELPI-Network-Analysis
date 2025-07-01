@@ -243,7 +243,7 @@ centralitymeasures_S <- rbind(centralitymeasures_W1SA_df, centralitymeasures_W2S
 ## Visualisation
 ```{r H7and8-visualisation}
 # Plot centrality of each node across time for alcohol use vs no alcohol use
-ggplot(centralitymeasures, aes(x = as.factor(wave), y = centrality_value, color = as.factor(AlcoholUse), group = interaction(node, AlcoholUse))) +
+ggplot(centralitymeasures, aes(x = as.factor(wave), y = centrality_value, color = as.factor("AlcoholUse"), group = interaction(node, "AlcoholUse"))) +
   geom_line(linewidth = 1) +
   geom_point(size = 2) +
   facet_grid(centrality_type ~ node, scales = "free_y") +

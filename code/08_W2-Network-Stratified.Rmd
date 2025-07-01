@@ -36,7 +36,8 @@ W2_cbcl_no_alcohol<- merge(no_alcohol_group, cbcl_wide_wave2, by = "folio")
 #Plotting Network using Lasso + Centrality Analysis from (Fritz et al, 2020)}
 
 # Step 1 Create Correlation matrix (excluding 'folio')
-symptom_data2SA <- W2_cbcl_alcohol_use  %>% select(-folio, -g9) #filtering participant ID 
+symptom_data2SA <- W2_cbcl_alcohol_use  %>% select(-folio, -g9) #filtering participant ID
+symptom_data2SA <- symptom_data2SA %>% select(where(is.numeric)) # Remove non-numeric columns
 symptom_corr2SA <- cor(symptom_data2SA, use = "pairwise.complete.obs") # cor function computes the correlation between columns x and y,  "pairwise.complete.obscomputes each pairwise correlation using only the rows (observations) that have non-missing values for that pair of variables
 
 # Step 2 Apply graphical lasso using qgraph
@@ -66,6 +67,7 @@ symptom_glasso2SA <- qgraph(
 
 # Step 1 Create Correlation matrix (excluding 'folio')
 symptom_data2SN <- W2_cbcl_no_alcohol  %>% select(-folio, -g9) #filtering participant ID 
+symptom_data2SN <- symptom_data2SN %>% select(where(is.numeric)) # Remove non-numeric columns
 symptom_corr2SN <- cor(symptom_data2SN, use = "pairwise.complete.obs") # cor function computes the correlation between columns x and y,  "pairwise.complete.obscomputes each pairwise correlation using only the rows (observations) that have non-missing values for that pair of variables
 
 # Step 2 Apply graphical lasso using qgraph

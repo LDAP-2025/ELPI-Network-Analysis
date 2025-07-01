@@ -8,7 +8,7 @@ This is a replication of code for Confirmatory Network Analaysis from (Piazza et
 
 
 ```{r Setup}
-install.packages("bootnet")
+library("bootnet")
 library("bootnet")
 library("psychonetrics")
 ```
