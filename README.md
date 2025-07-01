@@ -45,9 +45,9 @@ This [script](code/02_Network_DataWrangling.Rmd) loads and inspects data, filter
 
 ## Networks without Stratification 
 Each of the following respective scripts plots newtork of CBCL subscale raw scores using qgraph and preforms centrality analysis.  
-For W1 [script](03_code/W1-Network.Rmd)  
-For W2 [script](04_code/W2-Network.Rmd)  
-For W3 [script](05_code/W3-Network.Rmd)  
+For W1 [script](code/03_W1-Network.Rmd)  
+For W2 [script](code/04_W2-Network.Rmd)  
+For W3 [script](code/05_W3-Network.Rmd)  
 
 ## Stratified Networks 
 Each of the following respective scripts stratifies data based on alcohol vs no-alcohol use during prenatal period and  plots newtork of CBCL subscale raw scores using qgraph and preforms centrality analysis.   
