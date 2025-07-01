@@ -38,7 +38,7 @@ Children's socio-emotional development
 
 
 ## Pipeline 
-This [script](code/Analysis_Pipeline.R) runs all subsequent scripts in the analysis. 
+This [script](code/01_Analysis_Pipeline.R) runs all subsequent scripts in the analysis. 
 
 ## Data Set up and Wrangling 
 This [script](code/02_Network_DataWrangling.Rmd) loads and inspects data, filtering data for variables of interest to be used in network analysis. 
