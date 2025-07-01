@@ -41,22 +41,22 @@ Children's socio-emotional development
 This [script](code/Analysis_Pipeline.R) runs all subsequent scripts in the analysis. 
 
 ## Data Set up and Wrangling 
-This [script](code/Network_DataWrangling.Rmd) loads and inspects data, filtering data for variables of interest to be used in network analysis. 
+This [script](code/01_Network_DataWrangling.Rmd) loads and inspects data, filtering data for variables of interest to be used in network analysis. 
 
 ## Networks without Stratification 
 Each of the following respective scripts plots newtork of CBCL subscale raw scores using qgraph and preforms centrality analysis.  
-For W1 [script](code/W1-Network.Rmd)  
-For W2 [script](code/W2-Network.Rmd)  
-For W3 [script](code/W3-Network.Rmd)  
+For W1 [script](02_code/W1-Network.Rmd)  
+For W2 [script](03_code/W2-Network.Rmd)  
+For W3 [script](04_code/W3-Network.Rmd)  
 
 ## Stratified Networks 
 Each of the following respective scripts stratifies data based on alcohol vs no-alcohol use during prenatal period and  plots newtork of CBCL subscale raw scores using qgraph and preforms centrality analysis.   
-For W1 [script](code/W1-Network-Stratified.Rmd)   
-For W2 [script](code/W2-Network-Stratified.Rmd)   
-For W3 [script](code/W3-Network-Stratified.Rmd)   
+For W1 [script](code/06_W1-Network-Stratified.Rmd)   
+For W2 [script](code/07_W2-Network-Stratified.Rmd)   
+For W3 [script](code/08_W3-Network-Stratified.Rmd)   
 
 ## Confirmatory Network Structure Analysis
-This [script](code/Confirmatory-Network-Analysis.Rmd) estimates the network for W1 and W2 Using Bootnet package, visualises the estimated network, Runs model 1: tests the fit of the network structure using adjacency matric of W1, and Runs model 2: comparison of contstrained vs free network structures  
+This [script](code/05_Confirmatory-Network-Analysis.Rmd) estimates the network for W1 and W2 Using Bootnet package, visualises the estimated network, Runs model 1: tests the fit of the network structure using adjacency matric of W1, and Runs model 2: comparison of contstrained vs free network structures  
 
 ## Temperature Analysis 
-This [script](code/Temperature-Analysis-Attempt.Rmd) imputes  CBCL scores to binary values and reshapes data for ising model, it then fits multi-group ising models, creates model list and compares by BIC, plots the network of the best model, extracts temperature value and plots temperature value. 
+This [script](code/09_Temperature-Analysis-Attempt.Rmd) imputes  CBCL scores to binary values and reshapes data for ising model, it then fits multi-group ising models, creates model list and compares by BIC, plots the network of the best model, extracts temperature value and plots temperature value. 
